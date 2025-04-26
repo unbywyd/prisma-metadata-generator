@@ -7,7 +7,7 @@ import { emptyDir, pathExists } from 'fsesm';
 import { loadPrismaSchema } from './prisma-schema-loader.js';
 import type { PrismaField, PrismaModel, PrismaMetadata, PrismaFieldType, UIMetaConfig } from './types.js';
 import { generateUiSchema, GenerateUiSchemaOptions } from './generate-ui-schema.js';
-
+export * from './types.js';
 // Функция для определения, является ли поле внешним ключом
 function isForeignKey(field: PrismaDMMF.Field, model: PrismaDMMF.Model): boolean {
   // Если поле является частью relationFromFields в каком-либо поле модели

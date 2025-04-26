@@ -1,3 +1,4 @@
+export * from './types.js';
 export type PrismaMetadataGeneratorConfig = {};
 export type GeneratorOptions = {
     schemaPath?: string;
