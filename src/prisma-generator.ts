@@ -46,7 +46,9 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model): PrismaF
     isFloat: field.type === 'Float' || field.type === 'Decimal',
     isList: field.isList,
     isRequired: field.isRequired,
-    referencedModel: field.type,
+    isEnum: field.kind === 'enum',
+    isId: field.isId,
+    referencedModel: field.relationName ? field.type : undefined,
     documentation: field.documentation,
     defaultValue: field.default,
     enumValues: field.kind === 'enum' ? enums[field.type] : undefined

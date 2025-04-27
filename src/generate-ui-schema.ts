@@ -301,7 +301,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (!displayField.displayExpression) {
             switch (field.type) {
                 case 'DateTime':
-                    displayField.displayExpression = `formatDate(model.${field.name}, 'DD.MM.YYYY HH:mm')`;
+                    displayField.displayExpression = `formatDate(model.${field.name}, 'dd.MM.yyyy HH:mm')`;
                     break;
                 case 'Number':
                     if (field.isFloat) {
