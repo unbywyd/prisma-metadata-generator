@@ -94,7 +94,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const modelConfig = options.models[modelName] || {};
         return {
             name: humanizeString(modelName),
-            pluralName: pluralize(modelName),
+            pluralName: humanizeString(pluralize(modelName)),
             excludeCreateFields: ["id", "createdAt", "updatedAt", "deletedAt"],
             excludeUpdateFields: ["id", "updatedAt", "createdAt"],
             canBeCreated: true,
@@ -305,9 +305,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     break;
                 case 'Number':
                     if (field.isFloat) {
-                        displayField.displayExpression = `formatNumber(model.${field.name}, 2)`;
+                        displayField.displayExpression = `toFixedNumber(model.${field.name}, 2)`;
                     } else {
-                        displayField.displayExpression = `formatNumber(model.${field.name}, 0)`;
+                        displayField.displayExpression = `toFixedNumber(model.${field.name}, 0)`;
                     }
                     break;
                 case 'Boolean':
@@ -438,8 +438,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 } else {
                     return `{ ${field.name}: { connect: { id: value } } }`;
                 }
-            case 'DateTime':
-                return `{ ${field.name}: new Date(value) }`;
             default:
                 return `{ ${field.name}: value }`;
         }
@@ -527,7 +525,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
-                pluralName: modelConfig.pluralName || pluralModelName,
+                pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
                 listFields: fields
