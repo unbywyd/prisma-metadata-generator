@@ -544,7 +544,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
-                displayFieldExpression: `model.${displayFieldModel} (model.id)`,
+                displayFieldExpression: `model.${displayFieldModel} + ' (' + model.id + ')'`,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
