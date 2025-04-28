@@ -74,6 +74,7 @@ export interface FilterConfig {
   isActive: boolean;
   field?: string; // Или базовый фильтр к БД
   control?: FormControlConfig; // Или кастомный фильтр
+  valueExpression?: StaticOrDynamic<object>; // выражение для вычисления значения
 }
 
 export interface SortConfig {

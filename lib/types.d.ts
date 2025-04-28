@@ -55,6 +55,7 @@ export interface FilterConfig {
     isActive: boolean;
     field?: string;
     control?: FormControlConfig;
+    valueExpression?: StaticOrDynamic<object>;
 }
 export interface SortConfig {
     name: string;

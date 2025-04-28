@@ -283,6 +283,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const modelConfig = getModelConfig(model.name);
         const includeFilterFields = modelConfig.includeFilterFields || [];
         if (includeFilterFields.includes(field.name)) return true;
+        if (field.isId) return false;
         if (modelConfig.excludeFilterFields && modelConfig.excludeFilterFields.includes(field.name)) return false;
         const includeFilterTypeFields = modelConfig.includeFilterTypeFields || ["Boolean", "Enum", "Number", "DateTime", "String", "Relation"];
         if (includeFilterTypeFields.includes(field.type)) return true;
@@ -504,7 +505,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
-                displayFieldExpression: displayFieldModel === 'id' ? `model.${displayFieldModel}` : `model.${displayFieldModel} + ' (' + model.id + ')'`,
+                displayFieldExpression: `model.${displayFieldModel}`,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
