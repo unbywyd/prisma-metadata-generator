@@ -252,6 +252,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (modelConfig.excludeSortFields && modelConfig.excludeSortFields.includes(field.name)) return false;
         const includeSortFields = modelConfig.includeSortFields || [];
         if (includeSortFields.includes(field.name)) return true;
+        const isEnum = field.type === 'Enum';
+        if (isEnum) {
+            return true;
+        }
         const includeSortTypeFields = modelConfig.includeSortTypeFields || ["DateTime", "Number"];
         if (includeSortTypeFields.includes(field.type)) return true;
         return false;
@@ -544,7 +548,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
-                displayFieldExpression: `model.${displayFieldModel} + ' (' + model.id + ')'`,
+                displayFieldExpression: displayFieldModel === 'id' ? `model.${displayFieldModel}` : `model.${displayFieldModel} + ' (' + model.id + ')'`,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
