@@ -58,7 +58,8 @@ export interface FilterConfig {
 }
 export interface SortConfig {
     name: string;
-    field: string;
+    field?: string;
+    customExpression?: string;
     defaultDirection?: 'asc' | 'desc';
     isHidden?: boolean;
     isActive?: boolean;
@@ -74,6 +75,7 @@ export interface FieldConfig {
 export interface EntityUIConfig {
     name: string;
     pluralName: string;
+    displayField: string;
     model: string;
     listFields: DisplayFieldConfig[];
     listFilters?: FilterConfig[];

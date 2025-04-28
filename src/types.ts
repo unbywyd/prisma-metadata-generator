@@ -80,7 +80,9 @@ export interface SortConfig {
   // Название сортировки
   name: string;
   // Поле для сортировки
-  field: string;
+  field?: string;
+  // Выражение для сортировки
+  customExpression?: string;
   // Направление сортировки по умолчанию
   defaultDirection?: 'asc' | 'desc';
   // Скрыть сортировку
@@ -107,6 +109,8 @@ export interface FieldConfig {
 export interface EntityUIConfig {
   name: string;
   pluralName: string;
+  displayField: string;
+  
   model: string;
   // Список полей для отображения в списке
   listFields: DisplayFieldConfig[];

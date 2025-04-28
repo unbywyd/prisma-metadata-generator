@@ -59,6 +59,7 @@ export type DefaultModelConfig = {
     viewInclude?: StaticOrDynamic<object>;
     listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
+    displayField?: string;
 };
 export type GenerateUiSchemaOptions = {
     defaultConfig?: DefaultModelConfig;

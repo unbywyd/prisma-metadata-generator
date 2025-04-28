@@ -73,6 +73,8 @@ export type DefaultModelConfig = {
     viewInclude?: StaticOrDynamic<object>;
     listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
+
+    displayField?: string;
 }
 
 export type GenerateUiSchemaOptions = {
@@ -373,10 +375,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     filter.whereExpression = `{ ${field.name}: { equals: value } }`;
                     break;
                 case 'Boolean':
-                    filter.whereExpression = `{ ${field.name}: { equals: value } }`;
+                    filter.whereExpression = `{ ${field.name}: value }`;
                     break;
                 case 'DateTime':
-                    filter.whereExpression = `{ ${field.name}: { equals: value } }`;
+                    filter.whereExpression = `{ ${field.name}: value }`;
                     break;
                 case 'Relation':
                     if (field.isList) {
@@ -386,7 +388,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     }
                     break;
                 case 'Enum':
-                    filter.whereExpression = `{ ${field.name}: { equals: value } }`;
+                    filter.whereExpression = `{ ${field.name}: value }`;
                     break;
                 default:
                     filter.whereExpression = `{ ${field.name}: { equals: value } }`;
@@ -501,7 +503,21 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         return displayField;
     }
-
+    function getDisplayFieldModel(model: PrismaModel): string {
+        const modelConfig = getModelConfig(model.name);
+        if (modelConfig.displayField) {
+            return modelConfig.displayField;
+        }
+        const textFields = model.fields.filter(field => field.type === 'String');
+        if (!textFields.length) {
+            return "id";
+        }
+        const priorityName = textFields.find(field => field.name?.toLowerCase().includes("name") || field.name?.toLowerCase().includes("title") || field.name?.toLowerCase().includes("label"));
+        if (priorityName) {
+            return priorityName.name;
+        }
+        return textFields[0].name;
+    }
     function generateUISchema(metadata: PrismaMetadata): Record<string, EntityUIConfig> {
         const uiSchemas: Record<string, EntityUIConfig> = {};
 
@@ -523,8 +539,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 .filter(field => shouldGenerateFilter(model, field))
                 .map(field => generateFilter(model, field));
 
+            const displayFieldModel = getDisplayFieldModel(model);
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
+                displayField: displayFieldModel,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
