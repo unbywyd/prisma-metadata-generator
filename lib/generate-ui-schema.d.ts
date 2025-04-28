@@ -3,6 +3,8 @@ import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, So
 export type DefaultModelConfig = {
     name?: string;
     pluralName?: string;
+    displayFieldExpression?: string;
+    displayField?: string;
     excludeListFields?: string[];
     includeListFields?: string[];
     excludeFilterFields?: string[];
@@ -59,7 +61,6 @@ export type DefaultModelConfig = {
     viewInclude?: StaticOrDynamic<object>;
     listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
-    displayField?: string;
 };
 export type GenerateUiSchemaOptions = {
     defaultConfig?: DefaultModelConfig;

@@ -110,6 +110,7 @@ export interface EntityUIConfig {
   name: string;
   pluralName: string;
   displayField: string;
+  displayFieldExpression?: string;
   
   model: string;
   // Список полей для отображения в списке

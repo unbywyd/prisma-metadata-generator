@@ -6,6 +6,9 @@ import humanizeString from 'humanize-string';
 export type DefaultModelConfig = {
     name?: string;
     pluralName?: string;
+    displayFieldExpression?: string;
+    displayField?: string;
+
     excludeListFields?: string[];
     includeListFields?: string[];
 
@@ -73,8 +76,6 @@ export type DefaultModelConfig = {
     viewInclude?: StaticOrDynamic<object>;
     listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
-
-    displayField?: string;
 }
 
 export type GenerateUiSchemaOptions = {
@@ -543,6 +544,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
+                displayFieldExpression: `model.${displayFieldModel} (model.id)`,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
