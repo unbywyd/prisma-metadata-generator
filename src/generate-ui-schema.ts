@@ -256,7 +256,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (isEnum) {
             return true;
         }
-        const includeSortTypeFields = modelConfig.includeSortTypeFields || ["DateTime", "Number"];
+        const includeSortTypeFields = modelConfig.includeSortTypeFields || ["DateTime", "Number", "String", "Boolean"];
         if (includeSortTypeFields.includes(field.type)) return true;
         return false;
     }
