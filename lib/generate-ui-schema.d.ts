@@ -28,15 +28,12 @@ export type DefaultModelConfig = {
     overrideFields?: {
         default?: {
             validation?: Record<string, any>;
-            defaultControlOptions?: FormControlConfig;
+            control?: FormControlConfig;
         };
         [key: string]: {
             name?: string;
-            defaultControlOptions?: FormControlConfig;
+            control?: FormControlConfig;
             validation?: Record<string, any>;
-            updateComputeExpression?: string;
-            createComputeExpression?: string;
-            filterWhereExpression?: string;
         };
     };
     overrideSortFields?: {

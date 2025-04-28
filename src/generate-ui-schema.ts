@@ -40,16 +40,12 @@ export type DefaultModelConfig = {
     overrideFields?: {
         default?: {
             validation?: Record<string, any>;
-            defaultControlOptions?: FormControlConfig;
+            control?: FormControlConfig;
         },
         [key: string]: {
             name?: string;
-            defaultControlOptions?: FormControlConfig;
+            control?: FormControlConfig;
             validation?: Record<string, any>;
-
-            updateComputeExpression?: string;
-            createComputeExpression?: string;
-            filterWhereExpression?: string;
         }
     }
 
@@ -119,18 +115,19 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     }
 
     function getFieldConfig(modelName: string, name: string): Partial<FieldConfig> & {
-        defaultControlOptions?: FormControlConfig;
+        control?: FormControlConfig;
         validation?: Record<string, any>;
-
-        updateComputeExpression?: string;
-        createComputeExpression?: string;
-        filterWhereExpression?: string;
     } {
         const modelConfig = getModelConfig(modelName);
         const overrideFields = (modelConfig.overrideFields || { default: {} });
         const defaultFieldConfig = overrideFields.default || {};
         const fieldOverride = overrideFields[name] || {};
-
+        if (fieldOverride.control || defaultFieldConfig.control) {
+            fieldOverride.control = {
+                ...defaultFieldConfig.control || {},
+                ...fieldOverride.control || {}
+            } as FormControlConfig;
+        }
         const fieldName = fieldOverride.name || humanizeString(name);
         return {
             name: fieldName,
@@ -193,7 +190,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
      */
     function generateFormControl(model: PrismaModel, field: PrismaField): FormControlConfig {
         const fieldConfig = getFieldConfig(model.name, field.name);
-        const defaultControlOptions = fieldConfig.defaultControlOptions || {} as FormControlConfig;
+        const defaultControlOptions = fieldConfig.control || {} as FormControlConfig;
         const control: FormControlConfig = {
             name: defaultControlOptions?.name || fieldConfig.name,
             type: defaultControlOptions?.type || getControlType(field),
@@ -224,12 +221,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (defaultControlOptions?.relation && 'object' == typeof defaultControlOptions.relation) {
             control.relation = defaultControlOptions.relation;
         }
-
-        /*if (!control.valueExpression) {
-            control.valueExpression = `value`;
-        }*/
-
         control.multi = field.isList;
+
+        if (!defaultControlOptions.valueExpression) {
+            control.valueExpression = generateComputeExpression(field);
+        }
 
         return control;
     }
@@ -366,40 +362,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             name: defaultFieldConfig.name || humanizeString(field.name),
             isHidden: false,
             isActive: false,
-            controls: [generateFormControl(model, field)]
+            field: field.name
         };
-        if (defaultFieldConfig.filterWhereExpression) {
-            filter.whereExpression = defaultFieldConfig.filterWhereExpression;
-        } else {
-            const type = field.type;
-            switch (type) {
-                case 'String':
-                    filter.whereExpression = `{ ${field.name}: { contains: value, mode: 'insensitive' } }`;
-                    break;
-                case 'Number':
-                    filter.whereExpression = `{ ${field.name}: { equals: value } }`;
-                    break;
-                case 'Boolean':
-                    filter.whereExpression = `{ ${field.name}: value }`;
-                    break;
-                case 'DateTime':
-                    filter.whereExpression = `{ ${field.name}: value }`;
-                    break;
-                case 'Relation':
-                    if (field.isList) {
-                        filter.whereExpression = `{ ${field.name}: { some: { id: { equals: value } } } }`;
-                    } else {
-                        filter.whereExpression = `{ ${field.name}: { id: { equals: value } } }`;
-                    }
-                    break;
-                case 'Enum':
-                    filter.whereExpression = `{ ${field.name}: value }`;
-                    break;
-                default:
-                    filter.whereExpression = `{ ${field.name}: { equals: value } }`;
-                    break;
-            }
-        }
         return filter;
     }
 
@@ -434,10 +398,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         };
     }
 
-    function generateComputeExpression(field: PrismaField, computeExpression: string): string {
-        if (computeExpression) {
-            return computeExpression;
-        }
+    function generateComputeExpression(field: PrismaField): string {
         switch (field.type) {
             case 'Relation':
                 if (field.isList) {
@@ -460,13 +421,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             return overrideCreateFields[field.name];
         }
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
-
-        const computeExpression = generateComputeExpression(field, defaultFieldConfig.createComputeExpression || defaultFieldConfig.computeExpression);
         return {
             name: defaultFieldConfig.name || humanizeString(field.name),
             field: field.name,
-            controls: [generateFormControl(model, field)],
-            computeExpression: computeExpression
+            control: generateFormControl(model, field),
         };
     }
 
@@ -477,12 +435,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             return overrideUpdateFields[field.name];
         }
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
-        const computeExpression = generateComputeExpression(field, defaultFieldConfig.updateComputeExpression || defaultFieldConfig.computeExpression);
         return {
             name: defaultFieldConfig.name || humanizeString(field.name),
             field: field.name,
-            controls: [generateFormControl(model, field)],
-            computeExpression: computeExpression
+            control: generateFormControl(model, field),
         };
     }
 

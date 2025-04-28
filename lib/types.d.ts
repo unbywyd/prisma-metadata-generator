@@ -21,7 +21,7 @@ export interface PrismaMetadata {
     models: PrismaModel[];
     enums: Record<string, string[]>;
 }
-export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image';
+export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
@@ -53,8 +53,8 @@ export interface FilterConfig {
     name: string;
     isHidden: boolean;
     isActive: boolean;
-    controls?: FormControlConfig[];
-    whereExpression?: StaticOrDynamic<object>;
+    field?: string;
+    control?: FormControlConfig;
 }
 export interface SortConfig {
     name: string;
@@ -66,11 +66,10 @@ export interface SortConfig {
 }
 export interface FieldConfig {
     name: string;
-    field: string;
+    field?: string;
     allowCreate?: boolean | string;
     allowUpdate?: boolean | string;
-    controls?: FormControlConfig[];
-    computeExpression?: string;
+    control?: FormControlConfig;
 }
 export interface EntityUIConfig {
     name: string;

@@ -36,7 +36,7 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 
-export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image';
+export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 
@@ -72,8 +72,8 @@ export interface FilterConfig {
   name: string;
   isHidden: boolean;
   isActive: boolean;
-  controls?: FormControlConfig[];
-  whereExpression?: StaticOrDynamic<object>;
+  field?: string; // Или базовый фильтр к БД
+  control?: FormControlConfig; // Или кастомный фильтр
 }
 
 export interface SortConfig {
@@ -95,15 +95,13 @@ export interface FieldConfig {
   // Название фильтра
   name: string;
   // Поле в модели
-  field: string;
+  field?: string;
   // Разрешить создание
   allowCreate?: boolean | string;
   // Разрешить обновление
   allowUpdate?: boolean | string;
   // Контролы для поля
-  controls?: FormControlConfig[];
-  // Выражение для вычисления, должен вернуть Partial<Model['data']> (на клиенте)
-  computeExpression?: string;
+  control?: FormControlConfig;
 }
 
 export interface EntityUIConfig {
@@ -111,7 +109,7 @@ export interface EntityUIConfig {
   pluralName: string;
   displayField: string;
   displayFieldExpression?: string;
-  
+
   model: string;
   // Список полей для отображения в списке
   listFields: DisplayFieldConfig[];
