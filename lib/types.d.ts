@@ -25,6 +25,7 @@ export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | '
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
+    displayName: string;
     type: ControlType;
     options?: Array<{
         name: string;
@@ -46,6 +47,7 @@ export interface FormControlConfig {
 }
 export interface DisplayFieldConfig {
     name: string;
+    displayName: string;
     className?: string;
     customRender?: string;
     field?: string;
@@ -54,6 +56,7 @@ export interface DisplayFieldConfig {
 }
 export interface FilterConfig {
     name: string;
+    displayName: string;
     isHidden: boolean;
     isActive: boolean;
     field?: string;
@@ -62,6 +65,7 @@ export interface FilterConfig {
 }
 export interface SortConfig {
     name: string;
+    displayName: string;
     field?: string;
     customExpression?: string;
     defaultDirection?: 'asc' | 'desc';
@@ -70,6 +74,7 @@ export interface SortConfig {
 }
 export interface FieldConfig {
     name: string;
+    displayName: string;
     field?: string;
     allowCreate?: boolean | string;
     allowUpdate?: boolean | string;

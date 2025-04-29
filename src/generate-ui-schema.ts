@@ -45,7 +45,7 @@ export type DefaultModelConfig = {
             control?: FormControlConfig;
         },
         [key: string]: {
-            name?: string;
+            displayName?: string;
             control?: FormControlConfig;
             validation?: Record<string, any>;
         }
@@ -131,9 +131,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 ...fieldOverride.control || {}
             } as FormControlConfig;
         }
-        const fieldName = fieldOverride.name || humanizeString(name);
         return {
-            name: fieldName,
+            name: name,
+            displayName: fieldOverride.displayName || humanizeString(name),
             ...defaultFieldConfig,
             ...fieldOverride
         };
@@ -194,8 +194,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function generateFormControl(model: PrismaModel, field: PrismaField): FormControlConfig {
         const fieldConfig = getFieldConfig(model.name, field.name);
         const defaultControlOptions = fieldConfig.control || {} as FormControlConfig;
+
+        const displayName = defaultControlOptions?.displayName || fieldConfig.displayName || humanizeString(field.name);
         const control: FormControlConfig = {
             name: defaultControlOptions?.name || fieldConfig.name,
+            displayName: displayName,
             type: defaultControlOptions?.type || getControlType(field),
             isRequired: defaultControlOptions?.isRequired ?? field.isRequired,
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field)
@@ -300,7 +303,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function generateListDisplayField(model: PrismaModel, field: PrismaField): DisplayFieldConfig {
         const fieldConfig = getFieldConfig(model.name, field.name);
         const displayField: DisplayFieldConfig = {
-            name: fieldConfig.name || humanizeString(field.name),
+            name: fieldConfig.name,
+            displayName: fieldConfig.displayName || humanizeString(field.name),
             field: field.name
         };
 
@@ -370,7 +374,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
         const filter: FilterConfig = {
-            name: defaultFieldConfig.name || humanizeString(field.name),
+            name: defaultFieldConfig.name || field.name,
+            displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             isHidden: false,
             isActive: false,
             field: field.name
@@ -393,7 +398,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const defaultOrderDirection = modelConfig.defaultOrderDirection;
         if (defaultOrderField == field.name) {
             return {
-                name: defaultFieldConfig.name || `Sort by ${humanizeString(field.name)}`,
+                name: defaultFieldConfig.name || field.name,
+                displayName: defaultFieldConfig.displayName || `Sort by ${humanizeString(field.name)}`,
                 field: field.name,
                 defaultDirection: defaultOrderDirection,
                 isHidden: false,
@@ -401,7 +407,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             };
         }
         return {
-            name: defaultFieldConfig.name || `Sort by ${humanizeString(field.name)}`,
+            name: defaultFieldConfig.name || field.name,
+            displayName: defaultFieldConfig.displayName || `Sort by ${humanizeString(field.name)}`,
             field: field.name,
             defaultDirection: field.type === 'DateTime' ? 'desc' : 'asc',
             isHidden: false,
@@ -433,7 +440,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
         return {
-            name: defaultFieldConfig.name || humanizeString(field.name),
+            name: defaultFieldConfig.name || field.name,
+            displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name,
             control: generateFormControl(model, field),
         };
@@ -447,7 +455,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
         return {
-            name: defaultFieldConfig.name || humanizeString(field.name),
+            name: defaultFieldConfig.name || field.name,
+            displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name,
             control: generateFormControl(model, field),
         };
@@ -462,7 +471,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
         const overrideListFields = modelConfig.overrideListFields || {};
         const displayField: DisplayFieldConfig = {
-            name: defaultFieldConfig.name || humanizeString(field.name),
+            name: defaultFieldConfig.name || field.name,
+            displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name
         };
         if (overrideListFields[field.name]) {

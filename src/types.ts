@@ -43,6 +43,7 @@ export type StaticOrDynamic<T> = T | string; // Важно: для select, inclu
 export interface FormControlConfig {
   // Название поля
   name: string;
+  displayName: string;
   type: ControlType;
   options?: Array<{ name: string; value: any }>;
   default?: any;
@@ -63,6 +64,7 @@ export interface FormControlConfig {
 export interface DisplayFieldConfig {
   // Название поля
   name: string;
+  displayName: string;
   className?: string;
   customRender?: string;
   field?: string; // поле в модели (если указано будет использоваться вместо displayExpression)
@@ -73,6 +75,7 @@ export interface DisplayFieldConfig {
 export interface FilterConfig {
   // Название фильтра
   name: string;
+  displayName: string;
   isHidden: boolean;
   isActive: boolean;
   field?: string; // Или базовый фильтр к БД
@@ -83,6 +86,7 @@ export interface FilterConfig {
 export interface SortConfig {
   // Название сортировки
   name: string;
+  displayName: string;
   // Поле для сортировки
   field?: string;
   // Выражение для сортировки
@@ -98,6 +102,7 @@ export interface SortConfig {
 export interface FieldConfig {
   // Название фильтра
   name: string;
+  displayName: string;
   // Поле в модели
   field?: string;
   // Разрешить создание

@@ -32,7 +32,7 @@ export type DefaultModelConfig = {
             control?: FormControlConfig;
         };
         [key: string]: {
-            name?: string;
+            displayName?: string;
             control?: FormControlConfig;
             validation?: Record<string, any>;
         };
