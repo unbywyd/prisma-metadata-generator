@@ -347,13 +347,14 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             if ("name" in overrideListFields[field.name]) {
                 displayField.name = overrideListFields[field.name].name;
             }
+            if ("isListHidden" in overrideListFields[field.name]) {
+                displayField.isListHidden = overrideListFields[field.name].isListHidden;
+            }
         }
         if (modelConfig.hiddenListFields && modelConfig.hiddenListFields.includes(field.name)) {
             displayField.isListHidden = true;
         }
-        if ("isListHidden" in overrideListFields[field.name]) {
-            displayField.isListHidden = overrideListFields[field.name].isListHidden;
-        }
+
         return displayField;
     }
 
