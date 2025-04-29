@@ -7,7 +7,9 @@ export type DefaultModelConfig = {
     displayField?: string;
     excludeListFields?: string[];
     includeListFields?: string[];
+    skipFieldsWithNames?: string[];
     hiddenListFields?: string[];
+    displayListFields?: string[];
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
     includeFilterFields?: string[];

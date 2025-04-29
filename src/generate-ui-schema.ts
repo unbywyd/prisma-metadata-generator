@@ -12,7 +12,10 @@ export type DefaultModelConfig = {
     excludeListFields?: string[];
     includeListFields?: string[];
 
+    skipFieldsWithNames?: string[];
+
     hiddenListFields?: string[];
+    displayListFields?: string[];
 
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
@@ -365,6 +368,28 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             displayField.isListHidden = true;
         }
 
+        const isRelation = field.type == "Relation";
+        if (isRelation) {
+            displayField.isListHidden = true;
+        }
+        if (field.isList) {
+            displayField.isListHidden = true;
+        }
+        if (field.isId) {
+            displayField.isListHidden = true;
+        }
+        if (field.type == "Json") {
+            displayField.isListHidden = true;
+        }
+
+        const isDate = field.type == "DateTime";
+        if (isDate && field.name?.toLowerCase() !== 'createdat') {
+            displayField.isListHidden = true;
+        }
+        if (modelConfig.displayListFields && modelConfig.displayListFields.includes(field.name)) {
+            displayField.isListHidden = false;
+            return displayField;
+        }
         return displayField;
     }
 
@@ -559,6 +584,21 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         return include;
     }
 
+    function limitVisibleColumns(fields: DisplayFieldConfig[]): DisplayFieldConfig[] {
+        const visibleFields = fields.filter(field => !field.isListHidden);
+        if (visibleFields.length > 5) {
+            let index = 0;
+            for (const field of visibleFields) {
+                if (field.isListHidden == undefined && index >= 5) {
+                    field.isListHidden = true;
+                } else if (field.isListHidden) {
+                    index++;
+                }
+            }
+        }
+        return fields;
+    }
+
     function generateUISchema(metadata: PrismaMetadata): Record<string, EntityUIConfig> {
         const uiSchemas: Record<string, EntityUIConfig> = {};
 
@@ -570,7 +610,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const modelConfig = getModelConfig(modelName);
             const additionalListSortFields = modelConfig.additionalListSortFields || [];
             const excludeFields = modelConfig.excludeFields || [];
-            const fields = model.fields.filter(field => !excludeFields.includes(field.name));
+            const skipFieldsWithNames = modelConfig.skipFieldsWithNames || ['password', 'token', 'salt', 'hash'];
+            const fields = model.fields.filter(field => !excludeFields.includes(field.name) && !skipFieldsWithNames.find(name => field.name?.toLowerCase().includes(name)));
             const listSorts = fields
                 .filter(field => shouldGenerateSort(model, field))
                 .map(field => generateSort(model, field));
@@ -582,6 +623,14 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
             const displayFieldModel = getDisplayFieldModel(model);
             const defaultListInclude = generateDefaultListInclude(model, metadata);
+
+            const listFields = limitVisibleColumns(
+                fields
+                    .filter(field => shouldDisplayInList(model, field))
+                    .map(field => generateListDisplayField(model, field))
+            );
+
+
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
@@ -589,9 +638,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
-                listFields: fields
-                    .filter(field => shouldDisplayInList(model, field))
-                    .map(field => generateListDisplayField(model, field)),
+                listFields: listFields,
 
                 listSorts: [...additionalListSortFields, ...listSorts],
                 listFilters: [...additionalListFilters, ...listFilters],
