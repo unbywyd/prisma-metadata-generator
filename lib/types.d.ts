@@ -46,8 +46,11 @@ export interface FormControlConfig {
 }
 export interface DisplayFieldConfig {
     name: string;
+    className?: string;
+    customRender?: string;
     field?: string;
     displayExpression?: string;
+    isListHidden?: boolean;
 }
 export interface FilterConfig {
     name: string;
@@ -94,7 +97,16 @@ export interface EntityUIConfig {
     listInclude?: StaticOrDynamic<object>;
 }
 export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
-export interface UIMetaConfig {
-    ui: EntityUIMetaConfig;
+export type AdminUIConfig = {
+    apiUrl: string;
+    logoUrl?: string;
+    title?: string;
+    description?: string;
+    language?: string;
+};
+export type UIMetaConfig = {
+    ui: {
+        models: EntityUIMetaConfig;
+    } & AdminUIConfig;
     metadata: PrismaMetadata;
-}
+};

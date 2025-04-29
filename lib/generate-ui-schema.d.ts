@@ -1,4 +1,4 @@
-import { PrismaMetadata, EntityUIMetaConfig, StaticOrDynamic } from './types.js';
+import { PrismaMetadata, EntityUIMetaConfig, StaticOrDynamic, AdminUIConfig } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 export type DefaultModelConfig = {
     name?: string;
@@ -7,6 +7,7 @@ export type DefaultModelConfig = {
     displayField?: string;
     excludeListFields?: string[];
     includeListFields?: string[];
+    hiddenListFields?: string[];
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
     includeFilterFields?: string[];
@@ -60,6 +61,7 @@ export type DefaultModelConfig = {
     listInclude?: StaticOrDynamic<object>;
 };
 export type GenerateUiSchemaOptions = {
+    ui?: AdminUIConfig;
     defaultConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: {
