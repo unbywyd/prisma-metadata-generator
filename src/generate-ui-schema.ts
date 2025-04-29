@@ -610,7 +610,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const modelConfig = getModelConfig(modelName);
             const additionalListSortFields = modelConfig.additionalListSortFields || [];
             const excludeFields = modelConfig.excludeFields || [];
-            const skipFieldsWithNames = modelConfig.skipFieldsWithNames || ['password', 'token', 'salt', 'hash'];
+            const skipFieldsWithNames = modelConfig.skipFieldsWithNames || [];
             const fields = model.fields.filter(field => !excludeFields.includes(field.name) && !skipFieldsWithNames.find(name => field.name?.toLowerCase().includes(name)));
             const listSorts = fields
                 .filter(field => shouldGenerateSort(model, field))
