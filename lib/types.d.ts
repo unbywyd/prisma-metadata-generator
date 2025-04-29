@@ -10,7 +10,6 @@ export interface PrismaField {
     referencedModel?: string;
     documentation?: string;
     defaultValue?: any;
-    enumValues?: string[];
 }
 export interface PrismaModel {
     name: string;
@@ -67,7 +66,7 @@ export interface SortConfig {
     name: string;
     displayName: string;
     field?: string;
-    customExpression?: string;
+    expression: string;
     defaultDirection?: 'asc' | 'desc';
     isHidden?: boolean;
     isActive?: boolean;
@@ -96,9 +95,7 @@ export interface EntityUIConfig {
     createFields?: FieldConfig[];
     updateFields?: FieldConfig[];
     viewFields?: DisplayFieldConfig[];
-    viewSelect?: StaticOrDynamic<object>;
     viewInclude?: StaticOrDynamic<object>;
-    listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
 }
 export type EntityUIMetaConfig = Record<string, EntityUIConfig>;

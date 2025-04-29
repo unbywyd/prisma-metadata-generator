@@ -51,7 +51,6 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model): PrismaF
     referencedModel: field.relationName ? field.type : undefined,
     documentation: field.documentation,
     defaultValue: field.default,
-    enumValues: field.kind === 'enum' ? enums[field.type] : undefined
   };
   return result;
 }

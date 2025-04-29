@@ -1,6 +1,6 @@
 {
   "name": "prisma-metadata-generator",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Generate metadata from your Prisma schema. Create metadata for your Fastify or other TypeScript applications.",
   "bin": {
     "prisma-metadata-generator": "lib/bin.js"

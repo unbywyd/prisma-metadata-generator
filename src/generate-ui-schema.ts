@@ -70,9 +70,7 @@ export type DefaultModelConfig = {
         [key: string]: DisplayFieldConfig
     }
 
-    viewSelect?: StaticOrDynamic<object>;
     viewInclude?: StaticOrDynamic<object>;
-    listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
 }
 
@@ -191,6 +189,14 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Генерирует базовый FormControlConfig для формы
      */
+    function getEnumValues(name: string): { name: string; value: any }[] {
+        const enumValues = metadata.enums[name] || [];
+        return enumValues.map((value: string) => ({
+            name: value,
+            value: value
+        }));
+    }
+
     function generateFormControl(model: PrismaModel, field: PrismaField): FormControlConfig {
         const fieldConfig = getFieldConfig(model.name, field.name);
         const defaultControlOptions = fieldConfig.control || {} as FormControlConfig;
@@ -204,11 +210,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field)
         };
 
-        if (field.type === 'Enum' && field.enumValues) {
-            control.options = field.enumValues.map((value: string) => ({
-                name: value,
-                value: value
-            }));
+        if (field.type === 'Enum') {
+            control.options = getEnumValues(field.type);
         }
 
         if (defaultControlOptions?.options && Array.isArray(defaultControlOptions.options)) {
@@ -243,7 +246,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         // Не показываем системные поля и сложные типы в списке
         const modelConfig = getModelConfig(model.name);
         if (modelConfig.excludeListFields && modelConfig.excludeListFields.includes(field.name)) return false;
-        if (field.isList) return false;
         const includeListFields = modelConfig.includeListFields || [];
         if (field.type === 'Json' && !includeListFields.includes(field.name)) return false;
         return true;
@@ -258,9 +260,13 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (isEnum) {
             return true;
         }
-        const includeSortTypeFields = modelConfig.includeSortTypeFields || ["DateTime", "Number", "String", "Boolean"];
-        if (includeSortTypeFields.includes(field.type)) return true;
-        return false;
+        if (field.referencedModel) {
+            return true;
+        }
+        if (field.type == "Json") {
+            return false;
+        }
+        return true;
     }
 
 
@@ -332,7 +338,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     break;
                 case 'Relation':
                     if (field.isList) {
-                        displayField.displayExpression = `model.${field.name} ? model.${field.name}.map(item => item.name).join(', ') : ''`;
+                        displayField.displayExpression = `model._count ? model._count.${field.name}: ''`;
                     } else {
                         displayField.displayExpression = `model.${field.name} ? model.${field.name}.name : ''`;
                     }
@@ -386,6 +392,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Генерирует сортировку для таблицы
      */
+
     function generateSort(model: PrismaModel, field: PrismaField): SortConfig {
         const modelConfig = getModelConfig(model.name);
         const overrideSortFields = modelConfig.overrideSortFields || {};
@@ -395,7 +402,16 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const defaultFieldConfig = getFieldConfig(model.name, field.name);
 
         const defaultOrderField = modelConfig.defaultOrderField;
-        const defaultOrderDirection = modelConfig.defaultOrderDirection;
+        const defaultOrderDirection = modelConfig.defaultOrderDirection ?? 'asc';
+        let customExpression = `{ ${field.name}: value }`;
+        if (field.referencedModel) {
+            if (!field.isList) {
+                customExpression = `{ ${field.name}: { ${getDisplayFieldModel(field.referencedModel)}: value } }`;
+            } else {
+                customExpression = `{ ${field.name}: { _count: value } }`;
+            }
+        }
+
         if (defaultOrderField == field.name) {
             return {
                 name: defaultFieldConfig.name || field.name,
@@ -403,7 +419,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 field: field.name,
                 defaultDirection: defaultOrderDirection,
                 isHidden: false,
-                isActive: true
+                isActive: true,
+                expression: customExpression
             };
         }
         return {
@@ -412,7 +429,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             field: field.name,
             defaultDirection: field.type === 'DateTime' ? 'desc' : 'asc',
             isHidden: false,
-            isActive: false
+            isActive: false,
+            expression: customExpression
         };
     }
 
@@ -485,7 +503,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         return displayField;
     }
-    function getDisplayFieldModel(model: PrismaModel): string {
+    function getDisplayFieldModel(_model: PrismaModel | string): string {
+        const model = typeof _model === 'string' ? metadata.models.find(model => model.name == _model) : _model;
         const modelConfig = getModelConfig(model.name);
         if (modelConfig.displayField) {
             return modelConfig.displayField;
@@ -500,6 +519,46 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         return textFields[0].name;
     }
+
+    function generateDefaultListInclude(model: PrismaModel, metadata: PrismaMetadata): Record<string, any> {
+        const relationFields = model.fields.filter(field =>
+            field.type === 'Relation' &&
+            field.referencedModel
+        );
+
+        if (relationFields.length === 0) {
+            return {};
+        }
+        const constFields: Array<string> = [];
+        const include: Record<string, any> = {};
+        for (const field of relationFields) {
+            if (!field.isList) {
+                const relationModel = metadata.models.find(m => m.name === field.referencedModel);
+                if (relationModel) {
+                    const displayField = getDisplayFieldModel(relationModel);
+                    include[field.name] = {
+                        select: {
+                            [displayField]: true,
+                            id: true
+                        }
+                    };
+                }
+            } else {
+                constFields.push(field.name);
+            }
+        }
+        if (constFields.length) {
+            include._count = {
+                select: constFields.reduce((acc: Record<string, boolean>, field) => {
+                    acc[field] = true;
+                    return acc;
+                }, {})
+            };
+        }
+
+        return include;
+    }
+
     function generateUISchema(metadata: PrismaMetadata): Record<string, EntityUIConfig> {
         const uiSchemas: Record<string, EntityUIConfig> = {};
 
@@ -522,6 +581,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 .map(field => generateFilter(model, field));
 
             const displayFieldModel = getDisplayFieldModel(model);
+            const defaultListInclude = generateDefaultListInclude(model, metadata);
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
                 displayField: displayFieldModel,
@@ -553,10 +613,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     .filter(field => shouldViewField(model, field))
                     .map(field => generateViewFieldConfig(model, field)),
 
-                listSelect: modelConfig.listSelect || {},
-                listInclude: modelConfig.listInclude || {},
-                viewSelect: modelConfig.viewSelect || {},
-                viewInclude: modelConfig.viewInclude || {}
+                listInclude: modelConfig.listInclude || defaultListInclude,
+                viewInclude: modelConfig.viewInclude || defaultListInclude
             };
 
             uiSchemas[modelName] = uiSchema;

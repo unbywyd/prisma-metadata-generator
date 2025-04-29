@@ -18,7 +18,6 @@ export interface PrismaField {
   referencedModel?: string;
   documentation?: string;
   defaultValue?: any;
-  enumValues?: string[];
 }
 
 export interface PrismaModel {
@@ -90,7 +89,7 @@ export interface SortConfig {
   // Поле для сортировки
   field?: string;
   // Выражение для сортировки
-  customExpression?: string;
+  expression: string;
   // Направление сортировки по умолчанию
   defaultDirection?: 'asc' | 'desc';
   // Скрыть сортировку
@@ -135,9 +134,7 @@ export interface EntityUIConfig {
   updateFields?: FieldConfig[];
   viewFields?: DisplayFieldConfig[];
 
-  viewSelect?: StaticOrDynamic<object>;
   viewInclude?: StaticOrDynamic<object>;
-  listSelect?: StaticOrDynamic<object>;
   listInclude?: StaticOrDynamic<object>;
 }
 

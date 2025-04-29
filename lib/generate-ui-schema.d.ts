@@ -55,9 +55,7 @@ export type DefaultModelConfig = {
     overrideViewFields?: {
         [key: string]: DisplayFieldConfig;
     };
-    viewSelect?: StaticOrDynamic<object>;
     viewInclude?: StaticOrDynamic<object>;
-    listSelect?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
 };
 export type GenerateUiSchemaOptions = {
