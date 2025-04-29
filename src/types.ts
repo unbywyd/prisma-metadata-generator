@@ -63,8 +63,11 @@ export interface FormControlConfig {
 export interface DisplayFieldConfig {
   // Название поля
   name: string;
+  className?: string;
+  customRender?: string;
   field?: string; // поле в модели (если указано будет использоваться вместо displayExpression)
   displayExpression?: string; // выражение для отображения поля
+  isListHidden?: boolean;
 }
 
 export interface FilterConfig {
@@ -135,9 +138,17 @@ export interface EntityUIConfig {
 
 export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
 
-
-export interface UIMetaConfig {
-  ui: EntityUIMetaConfig;
+export type AdminUIConfig = {
+  apiUrl: string;
+  logoUrl?: string;
+  title?: string;
+  description?: string;
+  language?: string;
+}
+export type UIMetaConfig = {
+  ui: {
+    models: EntityUIMetaConfig;
+  } & AdminUIConfig;
   metadata: PrismaMetadata;
 }
 

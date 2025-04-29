@@ -1,4 +1,4 @@
-import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType } from './types.js';
+import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType, AdminUIConfig } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 import pluralize from 'pluralize';
 import humanizeString from 'humanize-string';
@@ -11,6 +11,8 @@ export type DefaultModelConfig = {
 
     excludeListFields?: string[];
     includeListFields?: string[];
+
+    hiddenListFields?: string[];
 
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
@@ -75,6 +77,7 @@ export type DefaultModelConfig = {
 }
 
 export type GenerateUiSchemaOptions = {
+    ui?: AdminUIConfig;
     defaultConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: {
@@ -294,7 +297,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Генерирует DisplayField для таблицы
      */
-    function generateDisplayField(model: PrismaModel, field: PrismaField): DisplayFieldConfig {
+    function generateListDisplayField(model: PrismaModel, field: PrismaField): DisplayFieldConfig {
         const fieldConfig = getFieldConfig(model.name, field.name);
         const displayField: DisplayFieldConfig = {
             name: fieldConfig.name || humanizeString(field.name),
@@ -344,6 +347,12 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             if ("name" in overrideListFields[field.name]) {
                 displayField.name = overrideListFields[field.name].name;
             }
+        }
+        if (modelConfig.hiddenListFields && modelConfig.hiddenListFields.includes(field.name)) {
+            displayField.isListHidden = true;
+        }
+        if ("isListHidden" in overrideListFields[field.name]) {
+            displayField.isListHidden = overrideListFields[field.name].isListHidden;
         }
         return displayField;
     }
@@ -511,7 +520,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
                 listFields: fields
                     .filter(field => shouldDisplayInList(model, field))
-                    .map(field => generateDisplayField(model, field)),
+                    .map(field => generateListDisplayField(model, field)),
 
                 listSorts: [...additionalListSortFields, ...listSorts],
                 listFilters: [...additionalListFilters, ...listFilters],

@@ -5,7 +5,7 @@ import path from 'path';
 import type { DMMF as PrismaDMMF } from '@prisma/generator-helper';
 import { emptyDir, pathExists } from 'fsesm';
 import { loadPrismaSchema } from './prisma-schema-loader.js';
-import type { PrismaField, PrismaModel, PrismaMetadata, PrismaFieldType, UIMetaConfig } from './types.js';
+import type { PrismaField, PrismaModel, PrismaMetadata, PrismaFieldType, UIMetaConfig, AdminUIConfig } from './types.js';
 import { generateUiSchema, GenerateUiSchemaOptions } from './generate-ui-schema.js';
 export * from './types.js';
 // Функция для определения, является ли поле внешним ключом
@@ -129,9 +129,21 @@ export async function generate(options: GeneratorOptions) {
   };
   const uiConfig = generateUiSchema(metadata, config);
 
+  const uiAdminConfig: AdminUIConfig = {
+    apiUrl: 'http://localhost:3000/api',
+    logoUrl: 'https://placehold.co/150',
+    title: 'Dashboard',
+    description: 'Dashboard',
+    language: 'en',
+    ...config.ui || {}
+  }
+
   const output: UIMetaConfig = {
     metadata,
-    ui: uiConfig
+    ui: {
+      models: uiConfig,
+      ...uiAdminConfig
+    }
   };
   try {
     await fs.writeFile(path.resolve(outputDir, 'ui-config.json'), JSON.stringify(output, null, 2));
