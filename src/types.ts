@@ -66,6 +66,7 @@ export interface DisplayFieldConfig {
   // Название поля
   name: string;
   displayName: string;
+  accessExpression?: string; // выражение для проверки доступности поля
   className?: string;
   customRender?: string;
   field?: string; // поле в модели (если указано будет использоваться вместо displayExpression)
