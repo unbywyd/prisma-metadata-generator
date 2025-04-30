@@ -16,6 +16,8 @@ export interface PrismaField {
   isId: boolean;
   isEnum: boolean;
   referencedModel?: string;
+  referencedFieldName?: string;
+  referencedFieldIsList?: boolean;
   documentation?: string;
   defaultValue?: any;
 }

@@ -39,7 +39,14 @@ function convertFieldType(field: PrismaDMMF.Field): PrismaFieldType {
 }
 
 // Функция для преобразования поля Prisma в наш формат
-function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model): PrismaField {
+function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model, allModels: PrismaDMMF.Model[]): PrismaField {
+  /*
+  referencedFieldName?: string;
+  referencedFieldIsList?: boolean; 
+  */
+  const relationModel = allModels.find(m => m.name === field.type);
+  const referencedField = relationModel?.fields.find(f => f.relationName === field.relationName);
+
   const result: PrismaField = {
     name: field.name,
     type: convertFieldType(field),
@@ -47,20 +54,22 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model): PrismaF
     isList: field.isList,
     isRequired: field.isRequired,
     isEnum: field.kind === 'enum',
+    referencedFieldName: referencedField?.name,
+    referencedFieldIsList: referencedField?.isList,
     isId: field.isId,
     referencedModel: field.relationName ? field.type : undefined,
     documentation: field.documentation,
     defaultValue: field.default,
-  };
+  }
   return result;
 }
 
 // Функция для преобразования модели Prisma в наш формат
-function convertModel(model: PrismaDMMF.Model): PrismaModel {
+function convertModel(model: PrismaDMMF.Model, allModels: PrismaDMMF.Model[]): PrismaModel {
   // Фильтруем внешние ключи и преобразуем поля
   const fields = model.fields
     .filter(field => !isForeignKey(field, model))
-    .map(field => convertField(field, model));
+    .map(field => convertField(field, model, allModels));
 
   return {
     name: model.name,
@@ -118,8 +127,9 @@ export async function generate(options: GeneratorOptions) {
     enums[enumItem.name] = enumItem.values?.map((value) => value.name) || [];
   });
 
+  const allModels = prismaClientDmmf.datamodel.models as PrismaDMMF.Model[];
   // Преобразуем модели
-  const models = prismaClientDmmf.datamodel.models.map(convertModel);
+  const models = allModels.map(model => convertModel(model, allModels));
 
   // Формируем финальный объект метаданных
   const metadata: PrismaMetadata = {
