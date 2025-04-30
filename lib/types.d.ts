@@ -49,6 +49,7 @@ export interface FormControlConfig {
 export interface DisplayFieldConfig {
     name: string;
     displayName: string;
+    accessExpression?: string;
     className?: string;
     customRender?: string;
     field?: string;
