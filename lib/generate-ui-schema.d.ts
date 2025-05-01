@@ -30,13 +30,15 @@ export type DefaultModelConfig = {
     canBeViewed?: boolean;
     overrideFields?: {
         default?: {
-            validation?: Record<string, any>;
             control?: FormControlConfig;
         };
         [key: string]: {
-            displayName?: string;
             control?: FormControlConfig;
-            validation?: Record<string, any>;
+            displayName?: string;
+            canBeCreated?: boolean;
+            canBeEdited?: boolean;
+            canBeViewed?: boolean;
+            valueExpression?: StaticOrDynamic<object>;
         };
     };
     overrideSortFields?: {

@@ -37,7 +37,7 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 
-export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
+export type ControlType = 'text' | 'integer' | 'float' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 
@@ -48,6 +48,8 @@ export interface FormControlConfig {
   type: ControlType;
   options?: Array<{ name: string; value: any }>;
   default?: any;
+  defaultExpression?: string; // выражение для вычисления значения по умолчанию
+  valueExpression?: string; // выражение для вычисления значения
   validation?: Record<string, any>; // AJV валидация
   config?: Record<string, any>; // конфигурация для контрола
   relation?: {
@@ -55,8 +57,7 @@ export interface FormControlConfig {
     labelField: string;
     valueField: string;
   };
-  valueExpression?: string; // выражение для вычисления значения
-  multi?: boolean;
+  isMulti?: boolean;
   isRequired?: boolean | string; // если true, то поле будет обязательным, если строка, то JEXL выражение
   isDisabled?: boolean | string; // если true, то поле будет отключено, если строка, то JEXL выражение
   isHidden?: boolean | string; // если true, то поле будет скрыто, если строка, то JEXL выражение
@@ -107,12 +108,10 @@ export interface FieldConfig {
   displayName: string;
   // Поле в модели
   field?: string;
-  // Разрешить создание
-  allowCreate?: boolean | string;
-  // Разрешить обновление
-  allowUpdate?: boolean | string;
   // Контролы для поля
-  control?: FormControlConfig;
+  control: FormControlConfig;
+  // Выражение для вычисления значения
+  valueExpression: StaticOrDynamic<object>; 
 }
 
 export interface EntityUIConfig {

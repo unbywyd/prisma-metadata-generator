@@ -22,7 +22,7 @@ export interface PrismaMetadata {
     models: PrismaModel[];
     enums: Record<string, string[]>;
 }
-export type ControlType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
+export type ControlType = 'text' | 'integer' | 'float' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
@@ -33,6 +33,8 @@ export interface FormControlConfig {
         value: any;
     }>;
     default?: any;
+    defaultExpression?: string;
+    valueExpression?: string;
     validation?: Record<string, any>;
     config?: Record<string, any>;
     relation?: {
@@ -40,8 +42,7 @@ export interface FormControlConfig {
         labelField: string;
         valueField: string;
     };
-    valueExpression?: string;
-    multi?: boolean;
+    isMulti?: boolean;
     isRequired?: boolean | string;
     isDisabled?: boolean | string;
     isHidden?: boolean | string;
@@ -78,9 +79,8 @@ export interface FieldConfig {
     name: string;
     displayName: string;
     field?: string;
-    allowCreate?: boolean | string;
-    allowUpdate?: boolean | string;
-    control?: FormControlConfig;
+    control: FormControlConfig;
+    valueExpression: StaticOrDynamic<object>;
 }
 export interface EntityUIConfig {
     name: string;
