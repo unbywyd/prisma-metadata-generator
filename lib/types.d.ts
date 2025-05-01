@@ -1,8 +1,7 @@
-export type PrismaFieldType = 'String' | 'Number' | 'Boolean' | 'DateTime' | 'Json' | 'Enum' | 'Relation';
+export type PrismaFieldType = 'String' | 'Integer' | 'Float' | 'Boolean' | 'DateTime' | 'Json' | 'Enum' | 'Relation';
 export interface PrismaField {
     name: string;
     type: PrismaFieldType;
-    isFloat: boolean;
     isList: boolean;
     isRequired: boolean;
     isId: boolean;
@@ -22,11 +21,12 @@ export interface PrismaMetadata {
     models: PrismaModel[];
     enums: Record<string, string[]>;
 }
-export type ControlType = 'text' | 'integer' | 'float' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
+export type ControlType = 'text' | 'integer' | 'float' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
     displayName: string;
+    description?: string;
     type: ControlType;
     options?: Array<{
         name: string;

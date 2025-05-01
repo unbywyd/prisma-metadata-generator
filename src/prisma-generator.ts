@@ -20,22 +20,33 @@ const enums: Record<string, string[]> = {};
 
 // Функция для преобразования типа поля Prisma в наш тип
 function convertFieldType(field: PrismaDMMF.Field): PrismaFieldType {
-  switch (field.type) {
-    case 'Int':
-    case 'BigInt':
-    case 'Float':
-    case 'Decimal':
-      return 'Number';
-    case 'String':
-    case 'DateTime':
-    case 'Json':
-      return field.type;
-    case 'Bytes':
-      return 'String';
-    default:
-      // Для enum и relation типов
-      return field.kind === 'enum' ? 'Enum' : 'Relation';
+  if (field.type === 'Float' || field.type === 'Decimal') {
+    return 'Float';
   }
+  if (field.type === 'Int' || field.type === 'BigInt') {
+    return 'Integer';
+  }
+
+  if (field.type == 'Boolean') {
+    return 'Boolean';
+  }
+  if (field.type == 'Json') {
+    return 'Json';
+  }
+  if (field.type == 'Bytes') {
+    return 'String';
+  }
+  if (field.type == 'DateTime') {
+    return 'DateTime';
+  }
+  if (field.kind == 'enum') {
+    return 'Enum';
+  }
+  if (field.relationName) {
+    return 'Relation';
+  }
+
+  return 'String';
 }
 
 // Функция для преобразования поля Prisma в наш формат
@@ -50,9 +61,8 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model, allModel
   const result: PrismaField = {
     name: field.name,
     type: convertFieldType(field),
-    isFloat: field.type === 'Float' || field.type === 'Decimal',
     isList: field.isList,
-    isRequired: field.isRequired,
+    isRequired: field.isRequired && !field.hasDefaultValue && !field.isUpdatedAt && !field.isGenerated && !field.isList,
     isEnum: field.kind === 'enum',
     referencedFieldName: referencedField?.name,
     referencedFieldIsList: referencedField?.isList,

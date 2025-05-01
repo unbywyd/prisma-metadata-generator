@@ -1,6 +1,7 @@
 export type PrismaFieldType =
   | 'String'
-  | 'Number'
+  | 'Integer'
+  | 'Float'
   | 'Boolean'
   | 'DateTime'
   | 'Json'
@@ -10,7 +11,6 @@ export type PrismaFieldType =
 export interface PrismaField {
   name: string;
   type: PrismaFieldType;
-  isFloat: boolean;
   isList: boolean;
   isRequired: boolean;
   isId: boolean;
@@ -37,7 +37,7 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 
-export type ControlType = 'text' | 'integer' | 'float' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' | string;
+export type ControlType = 'text' | 'integer' | 'float' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 
@@ -45,6 +45,7 @@ export interface FormControlConfig {
   // Название поля
   name: string;
   displayName: string;
+  description?: string;
   type: ControlType;
   options?: Array<{ name: string; value: any }>;
   default?: any;
@@ -111,7 +112,7 @@ export interface FieldConfig {
   // Контролы для поля
   control: FormControlConfig;
   // Выражение для вычисления значения
-  valueExpression: StaticOrDynamic<object>; 
+  valueExpression: StaticOrDynamic<object>;
 }
 
 export interface EntityUIConfig {

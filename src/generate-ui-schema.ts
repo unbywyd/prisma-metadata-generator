@@ -152,18 +152,28 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Определяет тип контрола для формы на основе типа поля Prisma
      */
-    function getControlType(field: PrismaField): 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'file' | 'image' {
+    function getControlType(field: PrismaField): ControlType {
+
+        if (field.isList && field.referencedModel) {
+            return 'relation';
+        }
+        if (field.isList && field.type == "Json") {
+            return 'json';
+        }
+
         switch (field.type) {
             case 'String':
                 return 'text';
-            case 'Number':
-                return 'number';
+            case 'Integer':
+                return 'integer';
+            case 'Float':
+                return 'float';
             case 'Boolean':
                 return 'checkbox';
             case 'DateTime':
                 return 'date';
             case 'Json':
-                return 'editor';
+                return 'json';
             case 'Relation':
                 return 'relation';
             case 'Enum':
@@ -188,7 +198,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             } else if (field.name.toLowerCase().includes('password')) {
                 validation.format = 'password';
             }
-        } else if (field.type === 'Number') {
+        } else if (field.type === 'Integer') {
+            validation.type = 'integer';
+        } else if (field.type === 'Float') {
             validation.type = 'number';
         }
 
@@ -328,12 +340,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             case 'DateTime':
                 displayExpression = `formatDate(model.${field.name}, 'dd.MM.yyyy HH:mm')`;
                 break;
-            case 'Number':
-                if (field.isFloat) {
-                    displayExpression = `toFixedNumber(model.${field.name}, 2)`;
-                } else {
-                    displayExpression = `toFixedNumber(model.${field.name}, 0)`;
-                }
+            case 'Integer':
+                displayExpression = `toFixedNumber(model.${field.name}, 0)`;
+                break;
+            case 'Float':
+                displayExpression = `toFixedNumber(model.${field.name}, 2)`;
                 break;
             case 'Boolean':
                 displayExpression = `model.${field.name} ? 'Yes' : 'No'`;
@@ -631,6 +642,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const excludeFields = modelConfig.excludeFields || [];
             const skipFieldsWithNames = modelConfig.skipFieldsWithNames || [];
             const fields = model.fields.filter(field => !excludeFields.includes(field.name) && !skipFieldsWithNames.find(name => field.name?.toLowerCase().includes(name)));
+            
             const listSorts = fields
                 .filter(field => shouldGenerateSort(model, field))
                 .map(field => generateSort(model, field));
