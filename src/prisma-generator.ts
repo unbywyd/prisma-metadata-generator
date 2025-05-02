@@ -61,9 +61,9 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model, allModel
   const result: PrismaField = {
     name: field.name,
     type: convertFieldType(field),
+    enum: field.kind === 'enum' ? field.type : undefined,
     isList: field.isList,
     isRequired: field.isRequired && !field.hasDefaultValue && !field.isUpdatedAt && !field.isGenerated && !field.isList,
-    isEnum: field.kind === 'enum',
     referencedFieldName: referencedField?.name,
     referencedFieldIsList: referencedField?.isList,
     isId: field.isId,

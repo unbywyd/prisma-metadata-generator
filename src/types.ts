@@ -11,10 +11,10 @@ export type PrismaFieldType =
 export interface PrismaField {
   name: string;
   type: PrismaFieldType;
+  enum?: string;
   isList: boolean;
   isRequired: boolean;
   isId: boolean;
-  isEnum: boolean;
   referencedModel?: string;
   referencedFieldName?: string;
   referencedFieldIsList?: boolean;

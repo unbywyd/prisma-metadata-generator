@@ -214,9 +214,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
      * Генерирует базовый FormControlConfig для формы
      */
     function getEnumValues(name: string): { name: string; value: any }[] {
+
         const enumValues = metadata.enums[name] || [];
         return enumValues.map((value: string) => ({
-            name: value,
+            name: humanizeString(value),
             value: value
         }));
     }
@@ -237,10 +238,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         };
 
         if (field.type === 'Enum') {
-            control.options = getEnumValues(field.type);
+            control.options = getEnumValues(field.enum);
         }
 
-        if (defaultControlOptions?.options && Array.isArray(defaultControlOptions.options)) {
+        if (defaultControlOptions?.options && Array.isArray(defaultControlOptions.options) && defaultControlOptions?.options.length > 0) {
             control.options = defaultControlOptions.options?.map((option: any) => {
                 return "string" == typeof option ? { name: option, value: option } : option;
             });
