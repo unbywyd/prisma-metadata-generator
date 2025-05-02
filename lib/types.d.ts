@@ -22,7 +22,7 @@ export interface PrismaMetadata {
     models: PrismaModel[];
     enums: Record<string, string[]>;
 }
-export type ControlType = 'text' | 'integer' | 'float' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
