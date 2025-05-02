@@ -83,7 +83,6 @@ export interface EntityUIConfig {
     name: string;
     pluralName: string;
     displayField: string;
-    displayFieldExpression?: string;
     model: string;
     listFields: DisplayFieldConfig[];
     listFilters?: FilterConfig[];

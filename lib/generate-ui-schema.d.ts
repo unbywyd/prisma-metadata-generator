@@ -3,7 +3,6 @@ import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, So
 export type DefaultModelConfig = {
     name?: string;
     pluralName?: string;
-    displayFieldExpression?: string;
     displayField?: string;
     excludeListFields?: string[];
     includeListFields?: string[];
