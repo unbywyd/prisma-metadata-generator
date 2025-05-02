@@ -11,6 +11,7 @@ export interface PrismaField {
     referencedFieldIsList?: boolean;
     documentation?: string;
     defaultValue?: any;
+    isNullable: boolean;
 }
 export interface PrismaModel {
     name: string;
@@ -34,7 +35,6 @@ export interface FormControlConfig {
     }>;
     default?: any;
     defaultExpression?: string;
-    valueExpression?: string;
     validation?: Record<string, any>;
     config?: Record<string, any>;
     relation?: {
@@ -42,6 +42,7 @@ export interface FormControlConfig {
         labelField: string;
         valueField: string;
     };
+    isNullable: boolean;
     isMulti?: boolean;
     isRequired?: boolean | string;
     isDisabled?: boolean | string;
@@ -78,9 +79,8 @@ export interface SortConfig {
 export interface FieldConfig {
     name: string;
     displayName: string;
-    field?: string;
+    field: string;
     control: FormControlConfig;
-    valueExpression: StaticOrDynamic<object>;
 }
 export interface EntityUIConfig {
     name: string;

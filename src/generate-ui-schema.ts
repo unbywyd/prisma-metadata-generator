@@ -52,7 +52,7 @@ export type DefaultModelConfig = {
             canBeCreated?: boolean;
             canBeEdited?: boolean;
             canBeViewed?: boolean;
-            valueExpression?: StaticOrDynamic<object>;
+            //valueExpression?: StaticOrDynamic<object>;
         }
     }
 
@@ -140,7 +140,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         return {
             name: name,
             displayName: fieldOverride.displayName || humanizeString(name),
-            valueExpression: fieldOverride.valueExpression || generateComputeExpression(field),
+            //valueExpression: fieldOverride.valueExpression || generateComputeExpression(field),
             ...defaultFieldConfig,
             canBeCreated: fieldOverride.canBeCreated,
             canBeEdited: fieldOverride.canBeEdited,
@@ -232,7 +232,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             type: defaultControlOptions?.type || getControlType(field),
             isRequired: defaultControlOptions?.isRequired ?? field.isRequired,
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field),
-            defaultExpression: `model.${field.name}`
+            isNullable: field.isNullable,
+            //defaultExpression: `model.${field.name}`
         };
 
         if (field.type === 'Enum') {
@@ -257,9 +258,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         control.isMulti = field.isList;
 
-        if (!defaultControlOptions.valueExpression) {
+        /*if (!defaultControlOptions.valueExpression) {
             control.valueExpression = "value";
-        }
+        }*/
 
         return control;
     }
@@ -513,7 +514,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name,
             control: generateFormControl(model, field),
-            valueExpression: defaultFieldConfig.valueExpression || generateComputeExpression(field),
+            //valueExpression: defaultFieldConfig.valueExpression || generateComputeExpression(field),
         };
     }
 
@@ -529,7 +530,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name,
             control: generateFormControl(model, field),
-            valueExpression: defaultFieldConfig.valueExpression || generateComputeExpression(field),
+            //valueExpression: defaultFieldConfig.valueExpression || generateComputeExpression(field),
         };
     }
 
@@ -642,7 +643,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             const excludeFields = modelConfig.excludeFields || [];
             const skipFieldsWithNames = modelConfig.skipFieldsWithNames || [];
             const fields = model.fields.filter(field => !excludeFields.includes(field.name) && !skipFieldsWithNames.find(name => field.name?.toLowerCase().includes(name)));
-            
+
             const listSorts = fields
                 .filter(field => shouldGenerateSort(model, field))
                 .map(field => generateSort(model, field));

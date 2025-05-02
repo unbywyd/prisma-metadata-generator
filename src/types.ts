@@ -20,6 +20,7 @@ export interface PrismaField {
   referencedFieldIsList?: boolean;
   documentation?: string;
   defaultValue?: any;
+  isNullable: boolean;
 }
 
 export interface PrismaModel {
@@ -50,7 +51,6 @@ export interface FormControlConfig {
   options?: Array<{ name: string; value: any }>;
   default?: any;
   defaultExpression?: string; // выражение для вычисления значения по умолчанию
-  valueExpression?: string; // выражение для вычисления значения
   validation?: Record<string, any>; // AJV валидация
   config?: Record<string, any>; // конфигурация для контрола
   relation?: {
@@ -58,6 +58,7 @@ export interface FormControlConfig {
     labelField: string;
     valueField: string;
   };
+  isNullable: boolean;
   isMulti?: boolean;
   isRequired?: boolean | string; // если true, то поле будет обязательным, если строка, то JEXL выражение
   isDisabled?: boolean | string; // если true, то поле будет отключено, если строка, то JEXL выражение
@@ -107,12 +108,10 @@ export interface FieldConfig {
   // Название фильтра
   name: string;
   displayName: string;
-  // Поле в модели
-  field?: string;
+  // Поле в модели куда восстанавливать значение
+  field: string;
   // Контролы для поля
   control: FormControlConfig;
-  // Выражение для вычисления значения
-  valueExpression: StaticOrDynamic<object>;
 }
 
 export interface EntityUIConfig {

@@ -70,6 +70,7 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model, allModel
     referencedModel: field.relationName ? field.type : undefined,
     documentation: field.documentation,
     defaultValue: field.default,
+    isNullable: field.isRequired ? false : true
   }
   return result;
 }

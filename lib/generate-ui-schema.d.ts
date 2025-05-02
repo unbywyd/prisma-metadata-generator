@@ -38,7 +38,6 @@ export type DefaultModelConfig = {
             canBeCreated?: boolean;
             canBeEdited?: boolean;
             canBeViewed?: boolean;
-            valueExpression?: StaticOrDynamic<object>;
         };
     };
     overrideSortFields?: {
