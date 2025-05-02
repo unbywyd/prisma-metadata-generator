@@ -7,6 +7,7 @@ export interface PrismaField {
     isRequired: boolean;
     isId: boolean;
     referencedModel?: string;
+    referenceCanBeChanged?: boolean;
     referencedFieldName?: string;
     referencedFieldIsList?: boolean;
     documentation?: string;

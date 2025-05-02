@@ -125,6 +125,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         canBeCreated?: boolean;
         canBeEdited?: boolean;
         canBeViewed?: boolean;
+        referenceCanBeChanged?: boolean;
     } {
         const name = field?.name || "";
         const modelConfig = getModelConfig(modelName);
@@ -138,6 +139,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             } as FormControlConfig;
         }
         return {
+            referenceCanBeChanged: field?.referenceCanBeChanged,
             name: name,
             displayName: fieldOverride.displayName || humanizeString(name),
             //valueExpression: fieldOverride.valueExpression || generateComputeExpression(field),
@@ -202,10 +204,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             validation.type = 'integer';
         } else if (field.type === 'Float') {
             validation.type = 'number';
-        }
-
-        if (field.isRequired) {
-            validation.required = true;
         }
         return Object.keys(validation).length > 0 ? validation : undefined;
     }
@@ -299,6 +297,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (modelConfig.excludeCreateFields && modelConfig.excludeCreateFields.includes(field.name)) return false;
         const fieldConfig = getFieldConfig(model.name, field);
         if (fieldConfig.canBeCreated == false) return false;
+        if (!fieldConfig.referenceCanBeChanged && field.type == "Relation") return false;
         return true;
     }
 
@@ -307,6 +306,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (modelConfig.excludeUpdateFields && modelConfig.excludeUpdateFields.includes(field.name)) return false;
         const fieldConfig = getFieldConfig(model.name, field);
         if (fieldConfig.canBeEdited == false) return false;
+        if (!fieldConfig.referenceCanBeChanged && field.type == "Relation") return false;
         return true;
     }
 
