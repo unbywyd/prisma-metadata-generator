@@ -37,11 +37,7 @@ export interface FormControlConfig {
     defaultExpression?: string;
     validation?: Record<string, any>;
     config?: Record<string, any>;
-    relation?: {
-        model: string;
-        labelField: string;
-        valueField: string;
-    };
+    referencedModel?: string;
     isNullable: boolean;
     isMulti?: boolean;
     isRequired?: boolean | string;

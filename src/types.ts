@@ -53,11 +53,7 @@ export interface FormControlConfig {
   defaultExpression?: string; // выражение для вычисления значения по умолчанию
   validation?: Record<string, any>; // AJV валидация
   config?: Record<string, any>; // конфигурация для контрола
-  relation?: {
-    model: string;
-    labelField: string;
-    valueField: string;
-  };
+  referencedModel?: string;
   isNullable: boolean;
   isMulti?: boolean;
   isRequired?: boolean | string; // если true, то поле будет обязательным, если строка, то JEXL выражение

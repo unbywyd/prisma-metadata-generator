@@ -248,15 +248,12 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
 
         if (field.type === 'Relation' && field.referencedModel) {
-            control.relation = {
-                model: field.referencedModel,
-                labelField: 'name',
-                valueField: 'id'
-            };
+            control.referencedModel = field.referencedModel;
         }
-        if (defaultControlOptions?.relation && 'object' == typeof defaultControlOptions.relation) {
-            control.relation = defaultControlOptions.relation;
+        if (defaultControlOptions?.referencedModel) {
+            control.referencedModel = defaultControlOptions.referencedModel;
         }
+
         control.isMulti = field.isList;
 
         /*if (!defaultControlOptions.valueExpression) {
