@@ -30,7 +30,7 @@ export interface FormControlConfig {
     description?: string;
     type: ControlType;
     options?: Array<{
-        name: string;
+        label: string;
         value: any;
     }>;
     default?: any;

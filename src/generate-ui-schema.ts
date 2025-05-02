@@ -213,11 +213,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Генерирует базовый FormControlConfig для формы
      */
-    function getEnumValues(name: string): { name: string; value: any }[] {
+    function getEnumValues(name: string): { label: string; value: any }[] {
 
         const enumValues = metadata.enums[name] || [];
         return enumValues.map((value: string) => ({
-            name: humanizeString(value),
+            label: humanizeString(value),
             value: value
         }));
     }

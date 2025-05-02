@@ -48,7 +48,7 @@ export interface FormControlConfig {
   displayName: string;
   description?: string;
   type: ControlType;
-  options?: Array<{ name: string; value: any }>;
+  options?: Array<{ label: string; value: any }>;
   default?: any;
   defaultExpression?: string; // выражение для вычисления значения по умолчанию
   validation?: Record<string, any>; // AJV валидация
