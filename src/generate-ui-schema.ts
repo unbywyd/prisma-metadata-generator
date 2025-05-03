@@ -14,6 +14,8 @@ export type DefaultModelConfig = {
 
     skipFieldsWithNames?: string[];
 
+    addressFields?: string[];
+
     hiddenListFields?: string[];
     displayListFields?: string[];
 
@@ -156,7 +158,12 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     /**
      * Определяет тип контрола для формы на основе типа поля Prisma
      */
-    function getControlType(field: PrismaField): ControlType {
+    function getControlType(modelName: string, field: PrismaField): ControlType {
+        const modelConfig = getModelConfig(modelName);
+        const isAddress = modelConfig.addressFields?.includes(field.name);
+        if (isAddress && field.type == "Json") {
+            return 'address';
+        }
 
         if (field.isList && field.referencedModel) {
             return 'relation';
@@ -230,12 +237,14 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const control: FormControlConfig = {
             name: defaultControlOptions?.name || fieldConfig.name,
             displayName: displayName,
-            type: defaultControlOptions?.type || getControlType(field),
+            type: defaultControlOptions?.type || getControlType(model.name, field),
             isRequired: defaultControlOptions?.isRequired ?? field.isRequired,
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field),
             isNullable: field.isNullable,
             //defaultExpression: `model.${field.name}`
         };
+
+
 
         if (field.type === 'Enum') {
             control.options = getEnumValues(field.enum);
@@ -271,6 +280,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const modelConfig = getModelConfig(model.name);
         if (modelConfig.excludeListFields && modelConfig.excludeListFields.includes(field.name)) return false;
         const includeListFields = modelConfig.includeListFields || [];
+        const isAddress = modelConfig.addressFields?.includes(field.name);
+        if (isAddress && field.type == "Json") {
+            return true;
+        }
         if (field.type === 'Json' && !includeListFields.includes(field.name)) return false;
         return true;
     }
@@ -292,7 +305,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         return true;
     }
-
 
     function shouldCreateField(model: PrismaModel, field: PrismaField): boolean {
         const modelConfig = getModelConfig(model.name);
