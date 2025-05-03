@@ -52,7 +52,6 @@ export type DefaultModelConfig = {
             canBeCreated?: boolean;
             canBeEdited?: boolean;
             canBeViewed?: boolean;
-            //valueExpression?: StaticOrDynamic<object>;
         }
     }
 
@@ -97,6 +96,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function getModelConfig(modelName: string): DefaultModelConfig {
         const defaultConfig = options.defaultConfig || {};
         const modelConfig = options.models[modelName] || {};
+
         return {
             name: humanizeString(modelName),
             pluralName: humanizeString(pluralize(modelName)),
@@ -129,9 +129,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     } {
         const name = field?.name || "";
         const modelConfig = getModelConfig(modelName);
+
         const overrideFields = (modelConfig.overrideFields || { default: {} });
         const defaultFieldConfig = overrideFields.default || {};
         const fieldOverride = overrideFields[name] || {};
+
         if (fieldOverride.control || defaultFieldConfig.control) {
             fieldOverride.control = {
                 ...defaultFieldConfig.control || {},

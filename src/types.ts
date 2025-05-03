@@ -39,7 +39,7 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 
-export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 
