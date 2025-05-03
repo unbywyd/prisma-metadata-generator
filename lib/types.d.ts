@@ -53,6 +53,7 @@ export interface DisplayFieldConfig {
     customRender?: string;
     field?: string;
     displayExpression?: string;
+    type: ControlType;
     isListHidden?: boolean;
 }
 export interface FilterConfig {

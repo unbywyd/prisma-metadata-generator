@@ -161,9 +161,11 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function getControlType(modelName: string, field: PrismaField): ControlType {
         const modelConfig = getModelConfig(modelName);
         const isAddress = modelConfig.addressFields?.includes(field.name);
-        if (isAddress && field.type == "Json") {
+
+        if ((isAddress || field.name?.toLowerCase().startsWith("address")) && field.type == "Json") {
             return 'address';
         }
+
 
         if (field.isList && field.referencedModel) {
             return 'relation';
@@ -234,6 +236,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const defaultControlOptions = fieldConfig.control || {} as FormControlConfig;
 
         const displayName = defaultControlOptions?.displayName || fieldConfig.displayName || humanizeString(field.name);
+
         const control: FormControlConfig = {
             name: defaultControlOptions?.name || fieldConfig.name,
             displayName: displayName,
@@ -243,8 +246,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             isNullable: field.isNullable,
             //defaultExpression: `model.${field.name}`
         };
-
-
 
         if (field.type === 'Enum') {
             control.options = getEnumValues(field.enum);
@@ -281,7 +282,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (modelConfig.excludeListFields && modelConfig.excludeListFields.includes(field.name)) return false;
         const includeListFields = modelConfig.includeListFields || [];
         const isAddress = modelConfig.addressFields?.includes(field.name);
-        if (isAddress && field.type == "Json") {
+        if ((isAddress || field.name?.toLowerCase().startsWith("address")) && field.type == "Json") {
             return true;
         }
         if (field.type === 'Json' && !includeListFields.includes(field.name)) return false;
@@ -386,7 +387,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const displayField: DisplayFieldConfig = {
             name: fieldConfig.name,
             displayName: fieldConfig.displayName || humanizeString(field.name),
-            field: field.name
+            field: field.name,
+            type: fieldConfig.control?.type || getControlType(model.name, field)
         };
 
         displayField.displayExpression = generateDisplayExpression(field);
@@ -557,7 +559,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const displayField: DisplayFieldConfig = {
             name: defaultFieldConfig.name || field.name,
             displayName: defaultFieldConfig.displayName || humanizeString(field.name),
-            field: field.name
+            field: field.name,
+            type: defaultFieldConfig.control?.type || getControlType(model.name, field)
         };
         displayField.displayExpression = generateDisplayExpression(field);
         if (overrideListFields[field.name]) {

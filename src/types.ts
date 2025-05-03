@@ -71,6 +71,7 @@ export interface DisplayFieldConfig {
   customRender?: string;
   field?: string; // поле в модели (если указано будет использоваться вместо displayExpression)
   displayExpression?: string; // выражение для отображения поля
+  type: ControlType;
   isListHidden?: boolean;
 }
 
