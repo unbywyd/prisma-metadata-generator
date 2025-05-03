@@ -8,6 +8,8 @@ export type DefaultModelConfig = {
     includeListFields?: string[];
     skipFieldsWithNames?: string[];
     addressFields?: string[];
+    editorFields?: string[];
+    textareaFields?: string[];
     hiddenListFields?: string[];
     displayListFields?: string[];
     excludeFilterFields?: string[];

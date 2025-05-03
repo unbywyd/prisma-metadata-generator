@@ -15,6 +15,8 @@ export type DefaultModelConfig = {
     skipFieldsWithNames?: string[];
 
     addressFields?: string[];
+    editorFields?: string[];
+    textareaFields?: string[];
 
     hiddenListFields?: string[];
     displayListFields?: string[];
@@ -161,11 +163,17 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function getControlType(modelName: string, field: PrismaField): ControlType {
         const modelConfig = getModelConfig(modelName);
         const isAddress = modelConfig.addressFields?.includes(field.name);
-
+        const isEditor = modelConfig.editorFields?.includes(field.name);
+        if (isEditor) {
+            return 'editor';
+        }
         if ((isAddress || field.name?.toLowerCase().startsWith("address")) && field.type == "Json") {
             return 'address';
         }
-
+        const isTextarea = modelConfig.textareaFields?.includes(field.name);
+        if (isTextarea) {
+            return 'textarea';
+        }
 
         if (field.isList && field.referencedModel) {
             return 'relation';
