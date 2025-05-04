@@ -292,6 +292,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         control.isMulti = field.isList;
 
+        control.default = field.defaultValue;
+
         /*if (!defaultControlOptions.valueExpression) {
             control.valueExpression = "value";
         }*/
