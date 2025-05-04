@@ -40,6 +40,7 @@ export interface FormControlConfig {
     validation?: Record<string, any>;
     config?: Record<string, any>;
     referencedModel?: string;
+    relationFieldName?: string;
     isNullable: boolean;
     isMulti?: boolean;
     isRequired?: boolean | string;

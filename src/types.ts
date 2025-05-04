@@ -57,6 +57,7 @@ export interface FormControlConfig {
   validation?: Record<string, any>; // AJV валидация
   config?: Record<string, any>; // конфигурация для контрола
   referencedModel?: string;
+  relationFieldName?: string;
   isNullable: boolean;
   isMulti?: boolean;
   isRequired?: boolean | string; // если true, то поле будет обязательным, если строка, то JEXL выражение
@@ -78,7 +79,6 @@ export interface DisplayFieldConfig {
 }
 
 export interface FilterConfig {
-  // Название фильтра
   name: string;
   displayName: string;
   isHidden: boolean;

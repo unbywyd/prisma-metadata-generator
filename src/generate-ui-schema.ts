@@ -287,7 +287,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         if (defaultControlOptions?.referencedModel) {
             control.referencedModel = defaultControlOptions.referencedModel;
         }
-
+        if (control.referencedModel) {
+            control.relationFieldName = field.name;
+        }
         control.isMulti = field.isList;
 
         /*if (!defaultControlOptions.valueExpression) {
