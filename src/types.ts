@@ -1,3 +1,5 @@
+import { ListAction } from "./generate-ui-schema.js";
+
 export type PrismaFieldType =
   | 'String'
   | 'Integer'
@@ -117,6 +119,9 @@ export interface EntityUIConfig {
   pluralName: string;
   displayField: string;
   //displayFieldExpression?: string;
+
+  listActions?: ListAction[];
+  recordActions?: ListAction[];
 
   model: string;
   // Список полей для отображения в списке

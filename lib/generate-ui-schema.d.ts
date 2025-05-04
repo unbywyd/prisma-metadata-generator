@@ -1,11 +1,23 @@
 import { PrismaMetadata, EntityUIMetaConfig, StaticOrDynamic, AdminUIConfig } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
+export type ListAction = {
+    name: string;
+    displayName: string;
+    description?: string;
+    icon?: string;
+    fields?: FieldConfig[];
+    actionExpression?: string;
+    successMessage?: string;
+    isActiveExpression?: string;
+};
 export type DefaultModelConfig = {
     name?: string;
     pluralName?: string;
     displayField?: string;
     excludeListFields?: string[];
     includeListFields?: string[];
+    listActions?: ListAction[];
+    recordActions?: ListAction[];
     skipFieldsWithNames?: string[];
     addressFields?: string[];
     editorFields?: string[];

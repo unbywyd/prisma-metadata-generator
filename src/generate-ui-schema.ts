@@ -3,6 +3,17 @@ import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, So
 import pluralize from 'pluralize';
 import humanizeString from 'humanize-string';
 
+export type ListAction = {
+    name: string;
+    displayName: string;
+    description?: string;
+    icon?: string;
+    fields?: FieldConfig[];
+    actionExpression?: string;
+    successMessage?: string;
+    isActiveExpression?: string;
+}
+
 export type DefaultModelConfig = {
     name?: string;
     pluralName?: string;
@@ -11,6 +22,9 @@ export type DefaultModelConfig = {
 
     excludeListFields?: string[];
     includeListFields?: string[];
+
+    listActions?: ListAction[];
+    recordActions?: ListAction[];
 
     skipFieldsWithNames?: string[];
 
@@ -119,6 +133,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             overrideCreateFields: {},
             overrideUpdateFields: {},
             overrideViewFields: {},
+            listActions: [],
+            recordActions: [],
             ...defaultConfig,
             ...modelConfig
         };
@@ -694,6 +710,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 model: modelName,
 
                 listFields: listFields,
+                listActions: modelConfig.listActions || [],
+                recordActions: modelConfig.recordActions || [],
 
                 listSorts: [...additionalListSortFields, ...listSorts],
                 listFilters: [...additionalListFilters, ...listFilters],

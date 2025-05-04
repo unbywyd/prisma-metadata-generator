@@ -1,3 +1,4 @@
+import { ListAction } from "./generate-ui-schema.js";
 export type PrismaFieldType = 'String' | 'Integer' | 'Float' | 'Boolean' | 'DateTime' | 'Json' | 'Enum' | 'Relation';
 export interface PrismaField {
     name: string;
@@ -84,6 +85,8 @@ export interface EntityUIConfig {
     name: string;
     pluralName: string;
     displayField: string;
+    listActions?: ListAction[];
+    recordActions?: ListAction[];
     model: string;
     listFields: DisplayFieldConfig[];
     listFilters?: FilterConfig[];
