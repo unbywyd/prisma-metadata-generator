@@ -82,6 +82,10 @@ export interface FieldConfig {
     field: string;
     control: FormControlConfig;
 }
+export interface IncludeModel {
+    name: string;
+    extends: Record<string, any>;
+}
 export interface EntityUIConfig {
     name: string;
     pluralName: string;
@@ -101,6 +105,7 @@ export interface EntityUIConfig {
     viewFields?: DisplayFieldConfig[];
     viewInclude?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
+    includeModels?: IncludeModel[];
 }
 export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
 export type AdminUIConfig = {

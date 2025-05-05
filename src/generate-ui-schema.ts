@@ -1,4 +1,4 @@
-import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType, AdminUIConfig } from './types.js';
+import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType, AdminUIConfig, IncludeModel } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 import pluralize from 'pluralize';
 import humanizeString from 'humanize-string';
@@ -22,6 +22,8 @@ export type DefaultModelConfig = {
 
     excludeListFields?: string[];
     includeListFields?: string[];
+
+    includeModels?: IncludeModel[];
 
     listActions?: ListAction[];
     recordActions?: ListAction[];
@@ -135,6 +137,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             overrideViewFields: {},
             listActions: [],
             recordActions: [],
+            includeModels: [],
             ...defaultConfig,
             ...modelConfig
         };
@@ -630,7 +633,15 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         const constFields: Array<string> = [];
         const include: Record<string, any> = {};
+        const modelConfig = getModelConfig(model.name);
+        const includeModels = modelConfig.includeModels || [];
         for (const field of relationFields) {
+            if (includeModels.find(m => m.name === field.referencedModel)) {
+                const ext = includeModels.find(m => m.name === field.referencedModel)?.extends || true;
+                include[field.name] = ext ? {
+                    include: ext
+                } : true;
+            }
             if (!field.isList) {
                 const relationModel = metadata.models.find(m => m.name === field.referencedModel);
                 if (relationModel) {
@@ -644,14 +655,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 }
             } else {
                 constFields.push(field.name);
-                // Add special handling for MediaReference
-                if (field.referencedModel === 'MediaReference') {
-                    include[field.name] = {
-                        include: {
-                            media: true
-                        }
-                    };
-                }
             }
         }
         if (constFields.length) {
