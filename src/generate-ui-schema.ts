@@ -666,13 +666,16 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             } else {
                 constFields.push(field.name);
                 if (fields.length) {
+                    const selectFields: Record<string, boolean> = fields.reduce((acc: Record<string, boolean>, field) => {
+                        acc[field] = true;
+                        return acc;
+                    }, {})
                     include[field.name] = {
-                        select: fields.reduce((acc: Record<string, boolean>, field) => {
-                            acc[field] = true;
-                            return acc;
-                        }, {})
+                        select: {
+                            id: true,
+                            ...selectFields,
+                        }
                     }
-                    include['id'] = true;
                 }
             }
         }
