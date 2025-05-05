@@ -57,7 +57,7 @@ function convertField(field: PrismaDMMF.Field, model: PrismaDMMF.Model, allModel
   */
   const relationModel = allModels.find(m => m.name === field.type);
   const referencedField = relationModel?.fields.find(f => f.relationName === field.relationName);
-  const referenceCanBeChanged = (field?.isList && referencedField?.isList) || (!field?.isList);
+  const referenceCanBeChanged = (field?.isList && (referencedField?.isList || !referencedField?.isRequired)) || (!field?.isList);
   const result: PrismaField = {
     name: field.name,
     type: convertFieldType(field),
