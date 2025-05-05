@@ -672,6 +672,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                             return acc;
                         }, {})
                     }
+                    include['id'] = true;
                 }
             }
         }
