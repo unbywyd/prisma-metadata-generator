@@ -644,6 +644,14 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 }
             } else {
                 constFields.push(field.name);
+                // Add special handling for MediaReference
+                if (field.referencedModel === 'MediaReference') {
+                    include[field.name] = {
+                        include: {
+                            media: true
+                        }
+                    };
+                }
             }
         }
         if (constFields.length) {
@@ -705,6 +713,29 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     .map(field => generateListDisplayField(model, field))
             );
 
+            let listInclude: StaticOrDynamic<object> = defaultListInclude;
+            let viewInclude: StaticOrDynamic<object> = defaultListInclude;
+
+            if (modelConfig.listInclude) {
+                if ("object" == typeof modelConfig.listInclude) {
+                    listInclude = {
+                        ...defaultListInclude,
+                        ...modelConfig.listInclude
+                    };
+                } else {
+                    listInclude = modelConfig.listInclude;
+                }
+            }
+            if (modelConfig.viewInclude) {
+                if ("object" == typeof modelConfig.viewInclude) {
+                    viewInclude = {
+                        ...defaultListInclude,
+                        ...modelConfig.viewInclude
+                    };
+                } else {
+                    viewInclude = modelConfig.viewInclude;
+                }
+            }
 
             const uiSchema: EntityUIConfig = {
                 name: modelConfig.name || humanizeString(modelName),
@@ -737,8 +768,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     .filter(field => shouldViewField(model, field))
                     .map(field => generateViewFieldConfig(model, field)),
 
-                listInclude: modelConfig.listInclude || defaultListInclude,
-                viewInclude: modelConfig.viewInclude || defaultListInclude
+                listInclude: listInclude,
+                viewInclude: viewInclude
             };
 
             uiSchemas[modelName] = uiSchema;
