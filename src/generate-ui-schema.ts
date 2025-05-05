@@ -1,4 +1,4 @@
-import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType, AdminUIConfig, IncludeModel } from './types.js';
+import { PrismaMetadata, PrismaModel, PrismaField, EntityUIMetaConfig, StaticOrDynamic, ControlType, AdminUIConfig, IncludeRelationField } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 import pluralize from 'pluralize';
 import humanizeString from 'humanize-string';
@@ -23,7 +23,7 @@ export type DefaultModelConfig = {
     excludeListFields?: string[];
     includeListFields?: string[];
 
-    includeModels?: IncludeModel[];
+    includeRelationFields?: IncludeRelationField[];
 
     listActions?: ListAction[];
     recordActions?: ListAction[];
@@ -137,7 +137,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             overrideViewFields: {},
             listActions: [],
             recordActions: [],
-            includeModels: [],
+            includeRelationFields: [],
             ...defaultConfig,
             ...modelConfig
         };
@@ -634,27 +634,45 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const constFields: Array<string> = [];
         const include: Record<string, any> = {};
         const modelConfig = getModelConfig(model.name);
-        const includeModels = modelConfig.includeModels || [];
+        const includeRelationFields = modelConfig.includeRelationFields || [];
         for (const field of relationFields) {
-            if (includeModels.find(m => m.name === field.referencedModel)) {
-                const ext = includeModels.find(m => m.name === field.referencedModel)?.extends || true;
-                include[field.name] = ext ? {
-                    include: ext
-                } : true;
-            }
+            const hasIncludeModel = includeRelationFields.find(m => m.modelName === field.referencedModel);
+            const fields = hasIncludeModel ? hasIncludeModel.fields : [];
+
             if (!field.isList) {
                 const relationModel = metadata.models.find(m => m.name === field.referencedModel);
                 if (relationModel) {
                     const displayField = getDisplayFieldModel(relationModel);
+
+                    let selectFields: Record<string, any> = {
+                        [displayField]: true,
+                        id: true
+                    };
+                    if (fields.length) {
+                        selectFields = fields.reduce((acc: Record<string, boolean>, field) => {
+                            acc[field] = true;
+                            return acc;
+                        }, {})
+                    }
+
                     include[field.name] = {
                         select: {
+                            id: true,
                             [displayField]: true,
-                            id: true
+                            ...selectFields,
                         }
-                    };
+                    }
                 }
             } else {
                 constFields.push(field.name);
+                if (fields.length) {
+                    include[field.name] = {
+                        select: fields.reduce((acc: Record<string, boolean>, field) => {
+                            acc[field] = true;
+                            return acc;
+                        }, {})
+                    }
+                }
             }
         }
         if (constFields.length) {

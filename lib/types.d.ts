@@ -82,9 +82,9 @@ export interface FieldConfig {
     field: string;
     control: FormControlConfig;
 }
-export interface IncludeModel {
-    name: string;
-    extends: Record<string, any>;
+export interface IncludeRelationField {
+    modelName: string;
+    fields: string[];
 }
 export interface EntityUIConfig {
     name: string;
@@ -105,7 +105,7 @@ export interface EntityUIConfig {
     viewFields?: DisplayFieldConfig[];
     viewInclude?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
-    includeModels?: IncludeModel[];
+    includeRelationFields?: IncludeRelationField[];
 }
 export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
 export type AdminUIConfig = {
