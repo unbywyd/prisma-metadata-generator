@@ -92,6 +92,7 @@ export type TopModelConfig = {
     listSorts?: SortConfig[];
     listInclude?: StaticOrDynamic<object>;
     includeRelationFields?: IncludeRelationField[];
+    listFilters?: FilterConfig[];
 };
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
