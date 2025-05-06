@@ -113,6 +113,7 @@ export type TopModelConfig = {
     listSorts?: SortConfig[];
     listInclude?: StaticOrDynamic<object>;
     includeRelationFields?: IncludeRelationField[];
+    listFilters?: FilterConfig[];
 }
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
@@ -804,6 +805,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 listSorts: [...additionalListSortFields, ...listSorts],
                 listFilters: [...additionalListFilters, ...listFilters],
 
+                excludeMenu: modelConfig.excludeMenu,
+
                 canBeCreated: modelConfig.canBeCreated ?? true,
                 canBeDeleted: modelConfig.canBeDeleted ?? true,
                 canBeEdited: modelConfig.canBeEdited ?? true,
@@ -831,6 +834,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     displayName: humanizeString(modelName),
                     listFields: listFields,
                     listSorts: listSorts,
+                    listFilters: listFilters,
                     listInclude: listInclude,
                     includeRelationFields: modelConfig.includeRelationFields || []
                 }
