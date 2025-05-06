@@ -1,4 +1,4 @@
-import { PrismaMetadata, EntityUIMetaConfig, StaticOrDynamic, AdminUIConfig, IncludeRelationField } from './types.js';
+import { PrismaMetadata, StaticOrDynamic, AdminUIConfig, IncludeRelationField } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 export type ListAction = {
     name: string;
@@ -12,8 +12,10 @@ export type ListAction = {
 };
 export type DefaultModelConfig = {
     name?: string;
+    displayName?: string;
     pluralName?: string;
     displayField?: string;
+    excludeMenu?: boolean;
     excludeListFields?: string[];
     includeListFields?: string[];
     includeRelationFields?: IncludeRelationField[];
@@ -76,15 +78,35 @@ export type DefaultModelConfig = {
     viewInclude?: StaticOrDynamic<object>;
     listInclude?: StaticOrDynamic<object>;
 };
+export type MetricConfig = {
+    icon?: string;
+    displayName: string;
+    name: string;
+    where?: StaticOrDynamic<object>;
+};
+export type TopModelConfig = {
+    name: string;
+    displayName: string;
+    icon?: string;
+    listFields: DisplayFieldConfig[];
+    listSorts?: SortConfig[];
+    listInclude?: StaticOrDynamic<object>;
+    includeRelationFields?: IncludeRelationField[];
+};
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
     defaultConfig?: DefaultModelConfig;
     excludeModels?: string[];
-    models?: {
-        [key: string]: DefaultModelConfig;
-    };
-    additionalModels?: {
-        [key: string]: EntityUIConfig;
-    };
+    models?: DefaultModelConfig[];
+    metrics?: MetricConfig[];
+    additionalModels?: EntityUIConfig[];
+    topModels?: TopModelConfig[];
+    autoMetricModels?: string[];
+    autoTopModels?: string[];
+    excludeMenuModels?: string[];
 };
-export declare function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSchemaOptions): EntityUIMetaConfig;
+export declare function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSchemaOptions): {
+    models: EntityUIConfig[];
+    metrics: MetricConfig[];
+    topModels: TopModelConfig[];
+};
