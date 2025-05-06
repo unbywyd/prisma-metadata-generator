@@ -115,9 +115,9 @@ export async function generate(options: GeneratorOptions) {
 
   let config: Partial<GenerateUiSchemaOptions> = {
     defaultConfig: {},
-    models: {},
+    models: [],
     excludeModels: [],
-    additionalModels: {}
+    additionalModels: []
   };
   const configFilePath = path.resolve(prismaCWD, 'metadata-ui-config.json');
   if (!await pathExists(configFilePath)) {
@@ -140,15 +140,13 @@ export async function generate(options: GeneratorOptions) {
   });
 
   const allModels = prismaClientDmmf.datamodel.models as PrismaDMMF.Model[];
-  // Преобразуем модели
   const models = allModels.map(model => convertModel(model, allModels));
 
-  // Формируем финальный объект метаданных
   const metadata: PrismaMetadata = {
     models,
     enums
   };
-  const uiConfig = generateUiSchema(metadata, config);
+  const { models: uiConfig, metrics, topModels } = generateUiSchema(metadata, config);
 
   const uiAdminConfig: AdminUIConfig = {
     apiUrl: 'http://localhost:3000/api',
@@ -163,7 +161,9 @@ export async function generate(options: GeneratorOptions) {
     metadata,
     ui: {
       models: uiConfig,
-      ...uiAdminConfig
+      topModels: topModels,
+      metrics: metrics,
+      ...uiAdminConfig,
     }
   };
   try {

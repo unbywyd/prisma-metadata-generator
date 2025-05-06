@@ -16,9 +16,10 @@ export type ListAction = {
 
 export type DefaultModelConfig = {
     name?: string;
+    displayName?: string;
     pluralName?: string;
-    //displayFieldExpression?: string;
     displayField?: string;
+    excludeMenu?: boolean;
 
     excludeListFields?: string[];
     includeListFields?: string[];
@@ -98,25 +99,45 @@ export type DefaultModelConfig = {
     listInclude?: StaticOrDynamic<object>;
 }
 
+export type MetricConfig = {
+    icon?: string;
+    displayName: string;
+    name: string; // К какой модели делаем запрос
+    where?: StaticOrDynamic<object>; // Условие для запроса
+}
+export type TopModelConfig = {
+    name: string; // К какой модели делаем запрос
+    displayName: string;
+    icon?: string;
+    listFields: DisplayFieldConfig[];
+    listSorts?: SortConfig[];
+    listInclude?: StaticOrDynamic<object>;
+    includeRelationFields?: IncludeRelationField[];
+}
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
     defaultConfig?: DefaultModelConfig;
     excludeModels?: string[];
-    models?: {
-        [key: string]: DefaultModelConfig;
-    },
-    additionalModels?: {
-        [key: string]: EntityUIConfig;
-    }
+    models?: DefaultModelConfig[];
+    metrics?: MetricConfig[];
+    additionalModels?: EntityUIConfig[];
+    topModels?: TopModelConfig[];
+    autoMetricModels?: string[];
+    autoTopModels?: string[];
+    excludeMenuModels?: string[];
 }
 
 
-export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSchemaOptions): EntityUIMetaConfig {
+export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSchemaOptions): {
+    models: EntityUIConfig[];
+    metrics: MetricConfig[];
+    topModels: TopModelConfig[];
+} {
 
     function getModelConfig(modelName: string): DefaultModelConfig {
         const defaultConfig = options.defaultConfig || {};
-        const modelConfig = options.models[modelName] || {};
-
+        const modelConfig = options.models?.find(model => model.name == modelName) || {};
+        const excludeMenu = options.excludeMenuModels?.includes(modelName) || modelConfig.excludeMenu;
         return {
             name: humanizeString(modelName),
             pluralName: humanizeString(pluralize(modelName)),
@@ -138,6 +159,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             listActions: [],
             recordActions: [],
             includeRelationFields: [],
+            excludeMenu: excludeMenu,
             ...defaultConfig,
             ...modelConfig
         };
@@ -531,19 +553,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         };
     }
 
-    function generateComputeExpression(field: PrismaField): string {
-        switch (field.type) {
-            case 'Relation':
-                if (field.isList) {
-                    return `{ ${field.name}: { set: value.map(id => ({ id })) } }`;
-                } else {
-                    return `{ ${field.name}: { connect: { id: value } } }`;
-                }
-            default:
-                return `{ ${field.name}: value }`;
-        }
-    }
-
     /**
      * Генерирует поле формы
      */
@@ -706,11 +715,30 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         return fields;
     }
 
-    function generateUISchema(metadata: PrismaMetadata): Record<string, EntityUIConfig> {
-        const uiSchemas: Record<string, EntityUIConfig> = {};
+    const metrics: MetricConfig[] = options.metrics || [];
+    const topModels: TopModelConfig[] = options.topModels || [];
+
+
+    function generateUISchema(metadata: PrismaMetadata): EntityUIConfig[] {
+        const uiSchemas: EntityUIConfig[] = [];
+        const autoMetricModels = options.autoMetricModels || [];
+        const autoTopModels = options.autoTopModels || [];
 
         for (const model of metadata.models) {
             if (options.excludeModels && options.excludeModels.includes(model.name)) continue;
+            const isAutoMetric = autoMetricModels.includes(model.name);
+            const isAutoTop = autoTopModels.includes(model.name);
+
+            if (isAutoMetric) {
+                const metricConfig: MetricConfig = {
+                    icon: 'pi pi-chart-bar',
+                    displayName: humanizeString(model.name),
+                    name: model.name,
+                    where: {}
+                };
+                metrics.push(metricConfig);
+            }
+
             const modelName = model.name;
             const pluralModelName = pluralize(modelName);
 
@@ -763,9 +791,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             }
 
             const uiSchema: EntityUIConfig = {
-                name: modelConfig.name || humanizeString(modelName),
+                name: modelConfig.name,
+                displayName: modelConfig.displayName || humanizeString(modelName),
                 displayField: displayFieldModel,
-                //displayFieldExpression: `model.${displayFieldModel}`,
                 pluralName: humanizeString(modelConfig.pluralName || pluralModelName),
                 model: modelName,
 
@@ -797,7 +825,19 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 viewInclude: viewInclude
             };
 
-            uiSchemas[modelName] = uiSchema;
+            if (isAutoTop) {
+                const topModel: TopModelConfig = {
+                    name: modelName,
+                    displayName: humanizeString(modelName),
+                    listFields: listFields,
+                    listSorts: listSorts,
+                    listInclude: listInclude,
+                    includeRelationFields: modelConfig.includeRelationFields || []
+                }
+                topModels.push(topModel);
+            }
+
+            uiSchemas.push(uiSchema);
         }
 
         return uiSchemas;
@@ -805,6 +845,10 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
 
     const uiSchemas = generateUISchema(metadata);
-    const additionalUiSchemas = options.additionalModels || {};
-    return { ...uiSchemas, ...additionalUiSchemas };
+    const additionalUiSchemas = options.additionalModels || [];
+    return {
+        models: [...uiSchemas, ...additionalUiSchemas],
+        metrics: metrics,
+        topModels: topModels
+    }
 }

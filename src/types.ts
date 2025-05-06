@@ -1,4 +1,4 @@
-import { ListAction } from "./generate-ui-schema.js";
+import { ListAction, MetricConfig, TopModelConfig } from "./generate-ui-schema.js";
 
 export type PrismaFieldType =
   | 'String'
@@ -121,12 +121,15 @@ export interface IncludeRelationField {
 
 export interface EntityUIConfig {
   name: string;
+  displayName: string;
   pluralName: string;
   displayField: string;
   //displayFieldExpression?: string;
 
   listActions?: ListAction[];
   recordActions?: ListAction[];
+
+  excludeMenu?: boolean;
 
   model: string;
   // Список полей для отображения в списке
@@ -161,7 +164,9 @@ export type AdminUIConfig = {
 }
 export type UIMetaConfig = {
   ui: {
-    models: EntityUIMetaConfig;
+    models: EntityUIConfig[];
+    topModels: TopModelConfig[];
+    metrics: MetricConfig[];
   } & AdminUIConfig;
   metadata: PrismaMetadata;
 }
