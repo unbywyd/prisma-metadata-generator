@@ -9,9 +9,9 @@ export type ListAction = {
     description?: string;
     icon?: string;
     fields?: FieldConfig[];
-    actionExpression?: string;
+    actionExpression?: StaticOrDynamic<string>;
     successMessage?: string;
-    isActiveExpression?: string;
+    isActiveExpression?: StaticOrDynamic<boolean>;
 }
 
 export type DefaultModelConfig = {
@@ -102,11 +102,11 @@ export type DefaultModelConfig = {
 export type MetricConfig = {
     icon?: string;
     displayName: string;
-    name: string; // К какой модели делаем запрос
+    modelName: string; // К какой модели делаем запрос
     where?: StaticOrDynamic<object>; // Условие для запроса
 }
 export type TopModelConfig = {
-    name: string; // К какой модели делаем запрос
+    modelName: string; // К какой модели делаем запрос
     displayName: string;
     icon?: string;
     listFields: DisplayFieldConfig[];
@@ -190,7 +190,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             referenceCanBeChanged: field?.referenceCanBeChanged,
             name: name,
             displayName: fieldOverride.displayName || humanizeString(name),
-            //valueExpression: fieldOverride.valueExpression || generateComputeExpression(field),
             ...defaultFieldConfig,
             canBeCreated: fieldOverride.canBeCreated,
             canBeEdited: fieldOverride.canBeEdited,
@@ -293,8 +292,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             type: defaultControlOptions?.type || getControlType(model.name, field),
             isRequired: defaultControlOptions?.isRequired ?? field.isRequired,
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field),
-            isNullable: field.isNullable,
-            //defaultExpression: `model.${field.name}`
+            isNullable: field.isNullable
         };
 
         if (field.type === 'Enum') {
@@ -320,9 +318,6 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
         control.default = field.defaultValue;
 
-        /*if (!defaultControlOptions.valueExpression) {
-            control.valueExpression = "value";
-        }*/
 
         return control;
     }
@@ -734,7 +729,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                 const metricConfig: MetricConfig = {
                     icon: 'pi pi-chart-bar',
                     displayName: humanizeString(model.name),
-                    name: model.name,
+                    modelName: model.name,
                     where: {}
                 };
                 metrics.push(metricConfig);
@@ -830,7 +825,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
             if (isAutoTop) {
                 const topModel: TopModelConfig = {
-                    name: modelName,
+                    modelName: modelName,
                     displayName: humanizeString(modelName),
                     listFields: listFields,
                     listSorts: listSorts,

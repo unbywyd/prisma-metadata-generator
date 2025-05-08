@@ -116,6 +116,7 @@ export type AdminUIConfig = {
     title?: string;
     description?: string;
     language?: string;
+    aiEnabled?: boolean;
 };
 export type UIMetaConfig = {
     ui: {

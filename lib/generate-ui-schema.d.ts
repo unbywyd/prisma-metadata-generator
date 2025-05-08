@@ -6,9 +6,9 @@ export type ListAction = {
     description?: string;
     icon?: string;
     fields?: FieldConfig[];
-    actionExpression?: string;
+    actionExpression?: StaticOrDynamic<string>;
     successMessage?: string;
-    isActiveExpression?: string;
+    isActiveExpression?: StaticOrDynamic<boolean>;
 };
 export type DefaultModelConfig = {
     name?: string;
@@ -81,11 +81,11 @@ export type DefaultModelConfig = {
 export type MetricConfig = {
     icon?: string;
     displayName: string;
-    name: string;
+    modelName: string;
     where?: StaticOrDynamic<object>;
 };
 export type TopModelConfig = {
-    name: string;
+    modelName: string;
     displayName: string;
     icon?: string;
     listFields: DisplayFieldConfig[];
