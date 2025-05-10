@@ -48,6 +48,7 @@ export type DefaultModelConfig = {
     overrideFields?: {
         default?: {
             control?: FormControlConfig;
+            canBeInlineEdited?: boolean;
         };
         [key: string]: {
             control?: FormControlConfig;
@@ -55,6 +56,7 @@ export type DefaultModelConfig = {
             canBeCreated?: boolean;
             canBeEdited?: boolean;
             canBeViewed?: boolean;
+            canBeInlineEdited?: boolean;
         };
     };
     overrideSortFields?: {

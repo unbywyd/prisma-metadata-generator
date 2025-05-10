@@ -63,6 +63,9 @@ export interface FormControlConfig {
   isRequired?: boolean | string; // если true, то поле будет обязательным, если строка, то JEXL выражение
   isDisabled?: boolean | string; // если true, то поле будет отключено, если строка, то JEXL выражение
   isHidden?: boolean | string; // если true, то поле будет скрыто, если строка, то JEXL выражение
+
+  aiButtonEnabled?: boolean;
+  aiButtonPrompt?: string;
 }
 
 export interface DisplayFieldConfig {
@@ -76,6 +79,7 @@ export interface DisplayFieldConfig {
   displayExpression?: string; // выражение для отображения поля
   type: ControlType;
   isListHidden?: boolean;
+  canBeInlineEdited: boolean;
 }
 
 export interface FilterConfig {

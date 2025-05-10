@@ -66,6 +66,7 @@ export type DefaultModelConfig = {
     overrideFields?: {
         default?: {
             control?: FormControlConfig;
+            canBeInlineEdited?: boolean;
         },
         [key: string]: {
             control?: FormControlConfig;
@@ -73,6 +74,7 @@ export type DefaultModelConfig = {
             canBeCreated?: boolean;
             canBeEdited?: boolean;
             canBeViewed?: boolean;
+            canBeInlineEdited?: boolean;
         }
     }
 
@@ -172,6 +174,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         canBeEdited?: boolean;
         canBeViewed?: boolean;
         referenceCanBeChanged?: boolean;
+        canBeInlineEdited?: boolean;
     } {
         const name = field?.name || "";
         const modelConfig = getModelConfig(modelName);
@@ -292,7 +295,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             type: defaultControlOptions?.type || getControlType(model.name, field),
             isRequired: defaultControlOptions?.isRequired ?? field.isRequired,
             validation: defaultControlOptions?.validation || getFieldValidation(model.name, field),
-            isNullable: field.isNullable
+            isNullable: field.isNullable,
+            aiButtonEnabled: defaultControlOptions?.aiButtonEnabled ?? false,
+            aiButtonPrompt: defaultControlOptions?.aiButtonPrompt || ""
         };
 
         if (field.type === 'Enum') {
@@ -437,7 +442,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             name: fieldConfig.name,
             displayName: fieldConfig.displayName || humanizeString(field.name),
             field: field.name,
-            type: fieldConfig.control?.type || getControlType(model.name, field)
+            type: fieldConfig.control?.type || getControlType(model.name, field),
+            canBeInlineEdited: fieldConfig.canBeInlineEdited || false
         };
 
         displayField.displayExpression = generateDisplayExpression(field);
@@ -596,7 +602,8 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             name: defaultFieldConfig.name || field.name,
             displayName: defaultFieldConfig.displayName || humanizeString(field.name),
             field: field.name,
-            type: defaultFieldConfig.control?.type || getControlType(model.name, field)
+            type: defaultFieldConfig.control?.type || getControlType(model.name, field),
+            canBeInlineEdited: defaultFieldConfig.canBeInlineEdited || false
         };
         displayField.displayExpression = generateDisplayExpression(field);
         if (overrideListFields[field.name]) {

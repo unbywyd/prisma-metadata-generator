@@ -46,6 +46,8 @@ export interface FormControlConfig {
     isRequired?: boolean | string;
     isDisabled?: boolean | string;
     isHidden?: boolean | string;
+    aiButtonEnabled?: boolean;
+    aiButtonPrompt?: string;
 }
 export interface DisplayFieldConfig {
     name: string;
@@ -57,6 +59,7 @@ export interface DisplayFieldConfig {
     displayExpression?: string;
     type: ControlType;
     isListHidden?: boolean;
+    canBeInlineEdited: boolean;
 }
 export interface FilterConfig {
     name: string;
