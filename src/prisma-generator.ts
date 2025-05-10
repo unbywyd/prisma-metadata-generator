@@ -114,7 +114,7 @@ export async function generate(options: GeneratorOptions) {
   await emptyDir(outputDir);
 
   let config: Partial<GenerateUiSchemaOptions> = {
-    defaultConfig: {},
+    defaultModelConfig: {},
     models: [],
     excludeModels: [],
     additionalModels: []
@@ -149,10 +149,10 @@ export async function generate(options: GeneratorOptions) {
   const { models: uiConfig, metrics, topModels } = generateUiSchema(metadata, config);
 
   const uiAdminConfig: AdminUIConfig = {
-    apiUrl: 'http://localhost:3000/api',
+    apiUrl: 'http://localhost:3100',
     logoUrl: 'https://placehold.co/150',
-    title: 'Dashboard',
-    description: 'Dashboard',
+    projectName: 'Dashboard',
+    description: 'Admin UI of Dashboard',
     language: 'en',
     ...config.ui || {}
   }

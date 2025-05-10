@@ -96,7 +96,7 @@ export type TopModelConfig = {
 };
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
-    defaultConfig?: DefaultModelConfig;
+    defaultModelConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: DefaultModelConfig[];
     metrics?: MetricConfig[];

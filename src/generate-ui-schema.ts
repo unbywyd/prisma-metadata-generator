@@ -117,7 +117,7 @@ export type TopModelConfig = {
 }
 export type GenerateUiSchemaOptions = {
     ui?: AdminUIConfig;
-    defaultConfig?: DefaultModelConfig;
+    defaultModelConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: DefaultModelConfig[];
     metrics?: MetricConfig[];
@@ -136,7 +136,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 } {
 
     function getModelConfig(modelName: string): DefaultModelConfig {
-        const defaultConfig = options.defaultConfig || {};
+        const defaultConfig = options.defaultModelConfig || {};
         const modelConfig = options.models?.find(model => model.name == modelName) || {};
         const excludeMenu = options.excludeMenuModels?.includes(modelName) || modelConfig.excludeMenu;
         return {

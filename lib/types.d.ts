@@ -113,7 +113,7 @@ export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
 export type AdminUIConfig = {
     apiUrl: string;
     logoUrl?: string;
-    title?: string;
+    projectName?: string;
     description?: string;
     language?: string;
     aiEnabled?: boolean;

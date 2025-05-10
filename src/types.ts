@@ -124,7 +124,6 @@ export interface EntityUIConfig {
   displayName: string;
   pluralName: string;
   displayField: string;
-  //displayFieldExpression?: string;
 
   listActions?: ListAction[];
   recordActions?: ListAction[];
@@ -158,7 +157,7 @@ export type EntityUIMetaConfig = Record<string, EntityUIConfig>;
 export type AdminUIConfig = {
   apiUrl: string;
   logoUrl?: string;
-  title?: string;
+  projectName?: string;
   description?: string;
   language?: string;
   aiEnabled?: boolean;
