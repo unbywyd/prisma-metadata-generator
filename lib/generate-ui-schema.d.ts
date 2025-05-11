@@ -25,6 +25,12 @@ export type DefaultModelConfig = {
     addressFields?: string[];
     editorFields?: string[];
     textareaFields?: string[];
+    fileUploadFields?: string[];
+    imageUploadFields?: string[];
+    videoUploadFields?: string[];
+    audioUploadFields?: string[];
+    documentUploadFields?: string[];
+    mediaUploadFields?: string[];
     hiddenListFields?: string[];
     displayListFields?: string[];
     excludeFilterFields?: string[];

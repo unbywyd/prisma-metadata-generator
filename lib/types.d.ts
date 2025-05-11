@@ -24,7 +24,8 @@ export interface PrismaMetadata {
     models: PrismaModel[];
     enums: Record<string, string[]>;
 }
-export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
+export type UploadControlType = 'fileUpload' | 'imageUpload' | 'videoUpload' | 'audioUpload' | 'documentUpload' | 'mediaUpload';
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | UploadControlType;
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;
@@ -48,6 +49,7 @@ export interface FormControlConfig {
     isHidden?: boolean | string;
     aiButtonEnabled?: boolean;
     aiButtonPrompt?: string;
+    aiButtonType?: 'text' | 'html' | 'template' | 'json';
 }
 export interface DisplayFieldConfig {
     name: string;
