@@ -41,7 +41,8 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 
-export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor';
+export type UploadControlType = 'fileUpload' | 'imageUpload' | 'videoUpload' | 'audioUpload' | 'documentUpload' | 'mediaUpload';
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | UploadControlType;
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 
@@ -66,6 +67,7 @@ export interface FormControlConfig {
 
   aiButtonEnabled?: boolean;
   aiButtonPrompt?: string;
+  aiButtonType?: 'text' | 'html' | 'template' | 'json';
 }
 
 export interface DisplayFieldConfig {

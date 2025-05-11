@@ -34,6 +34,12 @@ export type DefaultModelConfig = {
     addressFields?: string[];
     editorFields?: string[];
     textareaFields?: string[];
+    fileUploadFields?: string[];
+    imageUploadFields?: string[];
+    videoUploadFields?: string[];
+    audioUploadFields?: string[];
+    documentUploadFields?: string[];
+    mediaUploadFields?: string[];
 
     hiddenListFields?: string[];
     displayListFields?: string[];
@@ -208,8 +214,32 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const modelConfig = getModelConfig(modelName);
         const isAddress = modelConfig.addressFields?.includes(field.name);
         const isEditor = modelConfig.editorFields?.includes(field.name);
+        const isFileUpload = modelConfig.fileUploadFields?.includes(field.name);
+        const isImageUpload = modelConfig.imageUploadFields?.includes(field.name);
+        const isVideoUpload = modelConfig.videoUploadFields?.includes(field.name);
+        const isAudioUpload = modelConfig.audioUploadFields?.includes(field.name);
+        const isDocumentUpload = modelConfig.documentUploadFields?.includes(field.name);
+        const isMediaUpload = modelConfig.mediaUploadFields?.includes(field.name);
         if (isEditor) {
             return 'editor';
+        }
+        if (isFileUpload) {
+            return 'fileUpload';
+        }
+        if (isImageUpload) {
+            return 'imageUpload';
+        }
+        if (isVideoUpload) {
+            return 'videoUpload';
+        }
+        if (isAudioUpload) {
+            return 'audioUpload';
+        }
+        if (isDocumentUpload) {
+            return 'documentUpload';
+        }
+        if (isMediaUpload) {
+            return 'mediaUpload';
         }
         if ((isAddress || field.name?.toLowerCase().startsWith("address")) && field.type == "Json") {
             return 'address';
