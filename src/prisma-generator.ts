@@ -3,7 +3,7 @@ const { getDMMF } = pkg;
 import { promises as fs } from 'fs';
 import path from 'path';
 import type { DMMF as PrismaDMMF } from '@prisma/generator-helper';
-import { emptyDir, pathExists } from 'fsesm';
+import { emptyDir, pathExists, readPackageJson } from 'fsesm';
 import { loadPrismaSchema } from './prisma-schema-loader.js';
 import type { PrismaField, PrismaModel, PrismaMetadata, PrismaFieldType, UIMetaConfig, AdminUIConfig } from './types.js';
 import { generateUiSchema, GenerateUiSchemaOptions } from './generate-ui-schema.js';
@@ -99,6 +99,79 @@ export type GeneratorOptions = {
   output?: string
 }
 
+
+export async function init(options: GeneratorOptions) {
+  let prismaLoaded = null;
+  try {
+    prismaLoaded = await loadPrismaSchema(options.cwd || process.cwd(), options.schemaPath);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
+  const prismaCWD = path.dirname(prismaLoaded.path);
+  const configFilePath = path.resolve(prismaCWD, 'metadata-ui-config.json');
+
+  // Check if config file already exists
+  if (await pathExists(configFilePath)) {
+    console.warn('⚠️ Config file already exists at ' + configFilePath);
+    return;
+  }
+
+  let data: Record<string, any> = {};
+  try {
+    data = await readPackageJson({
+      cwd: process.cwd()
+    });
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
+  const defaultConfig: GenerateUiSchemaOptions = {
+    metrics: [],
+    autoMetricModels: [],
+    apiUrl: "http://localhost:3100",
+    logoUrl: "https://placehold.co/150",
+    projectName: data?.name || "Dashboard",
+    language: "English",
+    description: data?.description || "Admin UI of Dashboard",
+    defaultModelConfig: {
+      excludeUpdateFields: [
+        "id",
+        "updatedAt"
+      ],
+      fileUploadFields: [],
+      imageUploadFields: [],
+      videoUploadFields: [],
+      audioUploadFields: [],
+      documentUploadFields: [],
+      mediaUploadFields: [],
+      assetUploadFields: [],
+      editorFields: [],
+      addressFields: [],
+      textareaFields: [
+        "content",
+        "message",
+        "description"
+      ]
+    },
+    autoTopModels: [],
+    topModels: [],
+    excludeMenuModels: [],
+    models: [],
+    excludeModels: [],
+    additionalModels: [],
+  };
+
+  try {
+    await fs.writeFile(configFilePath, JSON.stringify(defaultConfig, null, 2));
+    console.log('✅ Configuration file created successfully at ' + configFilePath);
+  } catch (e) {
+    console.error('⚠️ Error creating config file:', e);
+  }
+}
+
 export async function generate(options: GeneratorOptions) {
   let prismaLoaded = null;
   try {
@@ -154,16 +227,16 @@ export async function generate(options: GeneratorOptions) {
     projectName: 'Dashboard',
     description: 'Admin UI of Dashboard',
     language: 'en',
-    ...config.ui || {}
+    ...config || {}
   }
 
   const output: UIMetaConfig = {
     metadata,
     ui: {
+      ...uiAdminConfig,
       models: uiConfig,
       topModels: topModels,
       metrics: metrics,
-      ...uiAdminConfig,
     }
   };
   try {

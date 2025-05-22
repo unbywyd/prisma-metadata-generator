@@ -1,4 +1,4 @@
-import { PrismaMetadata, StaticOrDynamic, AdminUIConfig, IncludeRelationField } from './types.js';
+import { PrismaMetadata, StaticOrDynamic, IncludeRelationField } from './types.js';
 import { EntityUIConfig, FormControlConfig, DisplayFieldConfig, FilterConfig, SortConfig, FieldConfig } from './types.js';
 export type ListAction = {
     name: string;
@@ -31,6 +31,7 @@ export type DefaultModelConfig = {
     audioUploadFields?: string[];
     documentUploadFields?: string[];
     mediaUploadFields?: string[];
+    assetUploadFields?: string[];
     hiddenListFields?: string[];
     displayListFields?: string[];
     excludeFilterFields?: string[];
@@ -103,7 +104,12 @@ export type TopModelConfig = {
     listFilters?: FilterConfig[];
 };
 export type GenerateUiSchemaOptions = {
-    ui?: AdminUIConfig;
+    apiUrl?: string;
+    logoUrl?: string;
+    projectName?: string;
+    description?: string;
+    language?: string;
+    aiEnabled?: boolean;
     defaultModelConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: DefaultModelConfig[];

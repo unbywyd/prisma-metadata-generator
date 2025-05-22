@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { generate } from "./prisma-generator.js";
+import { generate, init } from "./prisma-generator.js";
 
 // Function to parse CLI arguments
 const parseArgs = (args: string[]) => {
@@ -27,6 +27,7 @@ Usage: prisma-metadata-generator --path=[path_to_schema]
 Options:
   --help, -h            Show this help message
   --version, -v         Show the installed version
+  --init                Initialize a new configuration file
   --path=[path]         Specify a Prisma schema file (default: ./prisma/schema.prisma)
   --output=[path]       Specify the output directory (default: ./metadata)
   `);
@@ -38,9 +39,22 @@ if (options.version || options.v) {
     process.exit(0);
 }
 
+
 // Loading and rendering Prisma Schema
 (async () => {
     try {
+        if (options.init) {
+            const filePath = typeof options.path === "string" ? options.path : undefined;
+            return init({
+                cwd: process.cwd(),
+                schemaPath: filePath,
+            }).then(() => {
+                process.exit(0);
+            }).catch((error) => {
+                console.error(error instanceof Error ? error.message : "❌ An unknown error occurred.");
+                process.exit(1);
+            });
+        }
         const filePath = typeof options.path === "string" ? options.path : undefined;
         const outputDir = typeof options.output === "string" ? options.output : "./metadata";
         generate({

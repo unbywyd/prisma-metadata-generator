@@ -40,6 +40,7 @@ export type DefaultModelConfig = {
     audioUploadFields?: string[];
     documentUploadFields?: string[];
     mediaUploadFields?: string[];
+    assetUploadFields?: string[];
 
     hiddenListFields?: string[];
     displayListFields?: string[];
@@ -124,7 +125,12 @@ export type TopModelConfig = {
     listFilters?: FilterConfig[];
 }
 export type GenerateUiSchemaOptions = {
-    ui?: AdminUIConfig;
+    apiUrl?: string;
+    logoUrl?: string;
+    projectName?: string;
+    description?: string;
+    language?: string;
+    aiEnabled?: boolean;
     defaultModelConfig?: DefaultModelConfig;
     excludeModels?: string[];
     models?: DefaultModelConfig[];
@@ -219,7 +225,12 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const isVideoUpload = modelConfig.videoUploadFields?.includes(field.name);
         const isAudioUpload = modelConfig.audioUploadFields?.includes(field.name);
         const isDocumentUpload = modelConfig.documentUploadFields?.includes(field.name);
-        const isMediaUpload = modelConfig.mediaUploadFields?.includes(field.name);
+        const isMediaUpload = (modelConfig.mediaUploadFields?.includes(field.name) && field.referencedModel == "MediaReference") || (field.referencedModel == "MediaReference" && field.type == "Relation");
+        const isAssetUpload = (modelConfig.assetUploadFields?.includes(field.name) && field.referencedModel == "Asset") || (field.referencedModel == "Asset" && field.type == "Relation");
+
+        if (isAssetUpload) {
+            return 'assetUpload';
+        }
         if (isEditor) {
             return 'editor';
         }

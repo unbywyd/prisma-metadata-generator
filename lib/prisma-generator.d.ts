@@ -5,4 +5,5 @@ export type GeneratorOptions = {
     cwd?: string;
     output?: string;
 };
+export declare function init(options: GeneratorOptions): Promise<void>;
 export declare function generate(options: GeneratorOptions): Promise<void>;
