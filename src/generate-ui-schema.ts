@@ -688,6 +688,18 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const include: Record<string, any> = {};
         const modelConfig = getModelConfig(model.name);
         const includeRelationFields = modelConfig.includeRelationFields || [];
+        if (!("Asset" in includeRelationFields)) {
+            includeRelationFields.push({
+                modelName: "Asset",
+                fields: ["id", "name", "url", "thumbnailUrl", "referenceType", "filesize", "mimetype"]
+            });
+        }
+        if (!("MediaReference" in includeRelationFields)) {
+            includeRelationFields.push({
+                modelName: "MediaReference",
+                fields: ["id", "media"]
+            });
+        }
         for (const field of relationFields) {
             const hasIncludeModel = includeRelationFields.find(m => m.modelName === field.referencedModel);
             const fields = hasIncludeModel ? hasIncludeModel.fields : [];
