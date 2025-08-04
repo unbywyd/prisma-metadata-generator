@@ -44,6 +44,7 @@ export type DefaultModelConfig = {
 
     hiddenListFields?: string[];
     displayListFields?: string[];
+    onlyDisplayListFields?: boolean;
 
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
@@ -374,6 +375,12 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
     function shouldDisplayInList(model: PrismaModel, field: PrismaField): boolean {
         // Не показываем системные поля и сложные типы в списке
         const modelConfig = getModelConfig(model.name);
+        
+        // Если включен режим "только указанные поля"
+        if (modelConfig.onlyDisplayListFields && modelConfig.displayListFields) {
+            return modelConfig.displayListFields.includes(field.name);
+        }
+        
         if (modelConfig.excludeListFields && modelConfig.excludeListFields.includes(field.name)) return false;
         const includeListFields = modelConfig.includeListFields || [];
         const isAddress = modelConfig.addressFields?.includes(field.name);

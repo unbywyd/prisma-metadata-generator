@@ -34,6 +34,7 @@ export type DefaultModelConfig = {
     assetUploadFields?: string[];
     hiddenListFields?: string[];
     displayListFields?: string[];
+    onlyDisplayListFields?: boolean;
     excludeFilterFields?: string[];
     includeFilterTypeFields?: string[];
     includeFilterFields?: string[];
