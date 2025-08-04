@@ -540,10 +540,13 @@ The system applies field rules in this order (later rules override earlier ones)
 - Ignores all other field generation rules
 - Perfect for exact control over visible columns
 
-### Adding Custom/Computed Fields
+### Adding Custom/Computed Fields (Virtual Fields)
 
-You can add fields that don't exist in your Prisma schema:
+✨ **NEW FEATURE: Virtual Fields Support**
 
+You can now add fields that don't exist in your Prisma schema using `overrideListFields` and `overrideViewFields`:
+
+**🔄 Old approach (still works):**
 ```json
 {
   "models": [
@@ -557,26 +560,63 @@ You can add fields that don't exist in your Prisma schema:
           "canBeInlineEdited": false,
           "displayExpression": "model.name + ' ' + (model.surname || '')",
           "isListHidden": false
-        },
-        "isAdminDisplay": {
-          "displayName": "Admin Status",
-          "field": "isAdminDisplay", 
-          "type": "text",
-          "canBeInlineEdited": false,
-          "displayExpression": "model.isAdmin ? '✅ Admin' : '👤 User'"
-        },
-        "interactionCount": {
-          "displayName": "Interactions",
-          "field": "interactionCount",
-          "type": "text", 
-          "canBeInlineEdited": false,
-          "displayExpression": "model._count ? model._count.interactionsFrom : 0"
         }
       }
     }
   ]
 }
 ```
+
+**✨ New approach with onlyDisplayListFields:**
+```json
+{
+  "models": [
+    {
+      "name": "Property",
+      "displayName": "Недвижимость",
+      
+      // ✅ Include virtual fields in the list
+      "displayListFields": [
+        "id", "name_ru", "status", "price",
+        "cityName",    // Virtual field
+        "brokerName"   // Virtual field  
+      ],
+      "onlyDisplayListFields": true,
+      
+      // ✅ Define virtual fields (don't exist in Prisma schema)
+      "overrideListFields": {
+        "cityName": {
+          "displayName": "Город",
+          "displayExpression": "model.city ? model.city.name_ru : 'Не указан'",
+          "type": "text",
+          "canBeInlineEdited": false
+        },
+        "brokerName": {
+          "displayName": "Брокер", 
+          "displayExpression": "model.broker ? model.broker.companyName : 'Не указан'",
+          "type": "text",
+          "canBeInlineEdited": false
+        }
+      },
+      
+      // ✅ Include related data for virtual fields
+      "listInclude": {
+        "city": { "select": { "id": true, "name_ru": true } },
+        "broker": { "select": { "id": true, "companyName": true } }
+      }
+    }
+  ]
+}
+```
+
+**How Virtual Fields Work:**
+
+1. **Add virtual field names** to `displayListFields`
+2. **Define virtual fields** in `overrideListFields`/`overrideViewFields` 
+3. **Use onlyDisplayListFields: true** for exact control
+4. **Include related data** via `listInclude` if needed
+
+**✅ Result: Virtual fields now appear in the generated UI schema!**
 
 ### Overriding Existing Fields
 

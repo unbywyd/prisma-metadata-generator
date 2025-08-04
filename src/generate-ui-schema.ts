@@ -822,12 +822,44 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
 
             const displayFieldModel = getDisplayFieldModel(model);
             const defaultListInclude = generateDefaultListInclude(model, metadata);
+            
+            // Generate all possible display fields (schema + virtual)
+            let allDisplayFields: DisplayFieldConfig[] = [];
+            
+            // 1. Add fields from Prisma schema
+            const schemaFields = fields
+                .filter(field => shouldDisplayInList(model, field))
+                .map(field => generateListDisplayField(model, field));
+            allDisplayFields = [...schemaFields];
 
-            const listFields = limitVisibleColumns(
-                fields
-                    .filter(field => shouldDisplayInList(model, field))
-                    .map(field => generateListDisplayField(model, field))
-            );
+            // 2. Add virtual fields from overrideListFields that don't exist in Prisma schema
+            const overrideListFields = modelConfig.overrideListFields || {};
+            Object.keys(overrideListFields).forEach(fieldName => {
+                const existsInSchema = fields.some(field => field.name === fieldName);
+                if (!existsInSchema) {
+                    const override = overrideListFields[fieldName];
+                    const virtualField: DisplayFieldConfig = {
+                        name: override.name || fieldName,
+                        displayName: override.displayName || fieldName,
+                        field: override.field || fieldName,
+                        type: override.type || 'text',
+                        canBeInlineEdited: override.canBeInlineEdited || false,
+                        displayExpression: override.displayExpression || `model.${fieldName}`,
+                        isListHidden: override.isListHidden || false
+                    };
+                    allDisplayFields.push(virtualField);
+                }
+            });
+
+            // 3. Apply onlyDisplayListFields filter if enabled
+            if (modelConfig.onlyDisplayListFields && modelConfig.displayListFields) {
+                allDisplayFields = allDisplayFields.filter(field => 
+                    modelConfig.displayListFields!.includes(field.name) ||
+                    modelConfig.displayListFields!.includes(field.field || field.name)
+                );
+            }
+
+            const listFields = limitVisibleColumns(allDisplayFields);
 
             let listInclude: StaticOrDynamic<object> = defaultListInclude;
             let viewInclude: StaticOrDynamic<object> = defaultListInclude;
@@ -882,9 +914,37 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
                     .filter(field => shouldUpdateField(model, field))
                     .map(field => generateUpdateFieldConfig(model, field)),
 
-                viewFields: fields
-                    .filter(field => shouldViewField(model, field))
-                    .map(field => generateViewFieldConfig(model, field)),
+                viewFields: (() => {
+                    // Generate all possible view fields (schema + virtual)
+                    let allViewFields: DisplayFieldConfig[] = [];
+                    
+                    // 1. Add fields from Prisma schema
+                    const schemaViewFields = fields
+                        .filter(field => shouldViewField(model, field))
+                        .map(field => generateViewFieldConfig(model, field));
+                    allViewFields = [...schemaViewFields];
+
+                    // 2. Add virtual fields from overrideViewFields that don't exist in Prisma schema
+                    const overrideViewFields = modelConfig.overrideViewFields || {};
+                    Object.keys(overrideViewFields).forEach(fieldName => {
+                        const existsInSchema = fields.some(field => field.name === fieldName);
+                        if (!existsInSchema) {
+                            const override = overrideViewFields[fieldName];
+                            const virtualField: DisplayFieldConfig = {
+                                name: override.name || fieldName,
+                                displayName: override.displayName || fieldName,
+                                field: override.field || fieldName,
+                                type: override.type || 'text',
+                                canBeInlineEdited: override.canBeInlineEdited || false,
+                                displayExpression: override.displayExpression || `model.${fieldName}`,
+                                isListHidden: override.isListHidden || false
+                            };
+                            allViewFields.push(virtualField);
+                        }
+                    });
+
+                    return allViewFields;
+                })(),
 
                 listInclude: listInclude,
                 viewInclude: viewInclude
