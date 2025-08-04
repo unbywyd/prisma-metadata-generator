@@ -57,6 +57,7 @@ Configure fields as file uploaders in `defaultModelConfig` or for specific model
       "coverUrl"
     ],
     "textareaFields": ["content", "message", "description"],
+    "repeaterFields": ["tags", "features", "galleries"],
     "excludeUpdateFields": ["id", "updatedAt"]
   }
 }
@@ -68,23 +69,79 @@ Configure fields as file uploaders in `defaultModelConfig` or for specific model
 - Fields linked to `Asset` model → `assetUpload`
 - Fields with names containing "photo", "image", "icon", "cover" → `fileUpload`
 - JSON fields with names starting with "address" → `address`
+- **String arrays** (`String[]` in Prisma schema) → `repeater`
+
+### Repeater Fields
+
+Repeater fields allow users to add/remove multiple instances of a group of fields. Perfect for:
+- Tags, categories, or labels
+- Image galleries with captions
+- Feature lists with descriptions  
+- Contact information (multiple phones/emails)
+- Pricing tiers or options
+
+```json
+{
+  "defaultModelConfig": {
+    "repeaterFields": ["tags", "features", "galleries", "contactMethods"]
+  },
+  "models": [
+    {
+      "name": "Property",
+      "repeaterFields": ["amenities", "photos", "priceOptions"]
+    }
+  ]
+}
+```
+
+**Use Cases:**
+- **Tags/Categories**: `["tag1", "tag2", "tag3"]`
+- **Feature Lists**: `[{"name": "WiFi", "description": "Free high-speed"}, {"name": "Parking", "description": "Underground garage"}]`
+- **Galleries**: `[{"url": "photo1.jpg", "caption": "Living room"}, {"url": "photo2.jpg", "caption": "Kitchen"}]`
+- **Contact Info**: `[{"type": "phone", "value": "+1234567890"}, {"type": "email", "value": "contact@example.com"}]`
+
+**Automatic Detection:**
+- **String arrays** (`String[]` in Prisma) automatically become `repeater` fields
+- Perfect for simple tags, categories, or lists of strings
+
+**Manual Configuration:**
+- Add field names to `repeaterFields` array in configuration
+- Works with `Json` fields containing arrays of objects or simple values
+- Admin UI will render add/remove buttons automatically
+
+**Prisma Schema Examples:**
+```prisma
+model Product {
+  id       Int      @id @default(autoincrement())
+  name     String
+  tags     String[] // ✅ Automatically becomes repeater
+  features Json     // ✅ Can be set as repeater via repeaterFields
+}
+```
 
 ### Supported Field Types
 
 The admin panel supports these field types:
 
 - `text` - Regular text input
+- `textarea` - Multi-line text input
+- `integer` - Integer number input
+- `float` - Numeric input with decimals
 - `date` - Date/time picker
 - `checkbox` - Boolean checkbox
 - `select` - Dropdown selection (for enums)
-- `float` - Numeric input with decimals
 - `fileUpload` - File upload control
+- `imageUpload` - Image file upload
+- `videoUpload` - Video file upload
+- `audioUpload` - Audio file upload
+- `documentUpload` - Document file upload
+- `mediaUpload` - Media file upload
+- `assetUpload` - Asset file upload
 - `editor` - Rich text editor
 - `json` - JSON editor
 - `relation` - Relationship selector
 - `address` - Address/location picker
-- `mediaUpload` - Media file upload
-- `assetUpload` - Asset file upload
+- `repeater` - Repeating field groups
 
 ## Field Display Configuration
 
@@ -508,12 +565,13 @@ You can control which fields appear in different contexts: list tables, create f
 The system applies field rules in this order (later rules override earlier ones):
 
 1. **Auto-generated fields** from Prisma schema
-2. **⚡ NEW: Only display mode** (`onlyDisplayListFields: true` - shows ONLY fields from `displayListFields`)
-3. **Global excludes** (`defaultModelConfig.excludeFields`)
-4. **Context-specific global excludes** (`defaultModelConfig.excludeListFields`, etc.)
-5. **Model-specific excludes** (`models[].excludeListFields`, etc.)
-6. **Explicit display lists** (`models[].displayListFields` - force show specific fields)
-7. **Hidden field lists** (`models[].hiddenListFields` - removes from display list)
+2. **✨ Virtual fields** from `overrideListFields`/`overrideViewFields` (fields that don't exist in schema)
+3. **⚡ NEW: Only display mode** (`onlyDisplayListFields: true` - shows ONLY fields from `displayListFields`)
+4. **Global excludes** (`defaultModelConfig.excludeFields`)
+5. **Context-specific global excludes** (`defaultModelConfig.excludeListFields`, etc.)
+6. **Model-specific excludes** (`models[].excludeListFields`, etc.)
+7. **Explicit display lists** (`models[].displayListFields` - force show specific fields)
+8. **Hidden field lists** (`models[].hiddenListFields` - removes from display list)
 
 ### ✨ NEW: onlyDisplayListFields
 
@@ -1376,7 +1434,8 @@ interface ListAction {
     "excludeCreateFields": ["id", "createdAt", "updatedAt"],
     "excludeUpdateFields": ["id", "updatedAt"],
     "fileUploadFields": ["mainPhotoUrl", "secondaryPhotoUrl", "photoUrl"],
-    "textareaFields": ["content", "message", "description"]
+    "textareaFields": ["content", "message", "description"],
+    "repeaterFields": ["tags", "features", "amenities", "photos"]
   },
 
   "models": [
@@ -1484,3 +1543,102 @@ This configuration provides a fully functional admin panel with customized field
 ```
 
 **100% reliable, minimal code, maximum control!** 🚀
+
+## 💡 Quick Examples
+
+### Simple Field Control:
+```json
+{
+  "displayListFields": ["id", "name", "email", "status"],
+  "onlyDisplayListFields": true
+}
+```
+
+### With Virtual Fields:
+```json
+{
+  "displayListFields": ["id", "name", "fullName", "lastSeen"],
+  "onlyDisplayListFields": true,
+  "overrideListFields": {
+    "fullName": {
+      "displayName": "Full Name",
+      "displayExpression": "model.firstName + ' ' + model.lastName",
+      "type": "text"
+    },
+    "lastSeen": {
+      "displayName": "Last Activity", 
+      "displayExpression": "formatDate(model.lastActivityAt, 'dd.MM.yyyy')",
+      "type": "text"
+    }
+  }
+}
+```
+
+### Real Estate Example:
+```json
+{
+  "name": "Property",
+  "displayListFields": ["id", "name_ru", "price", "cityName", "brokerName"],
+  "onlyDisplayListFields": true,
+  "overrideListFields": {
+    "cityName": {
+      "displayName": "Город",
+      "displayExpression": "model.city ? model.city.name_ru : 'Не указан'",
+      "type": "text"
+    },
+    "brokerName": {
+      "displayName": "Брокер",
+      "displayExpression": "model.broker ? model.broker.companyName : 'Не указан'",
+      "type": "text"
+    }
+  },
+  "listInclude": {
+    "city": { "select": { "name_ru": true } },
+    "broker": { "select": { "companyName": true } }
+  }
+}
+```
+
+### With Repeater Fields:
+```json
+{
+  "name": "Product",
+  "displayListFields": ["id", "name", "price", "tags", "featuresCount"],
+  "onlyDisplayListFields": true,
+  
+  // ✅ Manual repeater configuration for Json fields
+  "repeaterFields": ["features", "images", "options"],
+  
+  // ✅ tags field is String[] - automatically becomes repeater
+  // No need to add "tags" to repeaterFields
+  
+  "overrideListFields": {
+    "featuresCount": {
+      "displayName": "Features",
+      "displayExpression": "model.features ? model.features.length : 0",
+      "type": "integer"
+    }
+  }
+}
+```
+
+**Prisma Schema for this example:**
+```prisma
+model Product {
+  id       Int      @id @default(autoincrement())
+  name     String
+  price    Float
+  tags     String[] // ✅ Auto-repeater (String array)
+  features Json     // ✅ Manual repeater (via repeaterFields)
+  images   Json     // ✅ Manual repeater (via repeaterFields)
+  options  Json     // ✅ Manual repeater (via repeaterFields)
+}
+```
+
+**Key Benefits:**
+- ✅ **Virtual fields** work seamlessly with `onlyDisplayListFields`
+- ✅ **Auto-repeater** for String arrays (`String[]`) - zero configuration
+- ✅ **Manual repeater** for Json fields with complex data
+- ✅ **Clean configuration** - no complex excludes needed  
+- ✅ **Real relationships** - display data from related models
+- ✅ **Custom formatting** - format dates, numbers, combine fields

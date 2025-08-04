@@ -41,7 +41,7 @@ export interface PrismaMetadata {
 *  UI Metadata
 */
 export type UploadControlType = 'fileUpload' | 'imageUpload' | 'assetUpload'  | 'videoUpload' | 'audioUpload' | 'documentUpload' | 'mediaUpload';
-export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | UploadControlType;
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'repeater' | UploadControlType;
 
 export type StaticOrDynamic<T> = T | string; // Важно: для select, include, whereDynamicExpression
 

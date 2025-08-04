@@ -34,6 +34,7 @@ export type DefaultModelConfig = {
     addressFields?: string[];
     editorFields?: string[];
     textareaFields?: string[];
+    repeaterFields?: string[];
     fileUploadFields?: string[];
     imageUploadFields?: string[];
     videoUploadFields?: string[];
@@ -221,6 +222,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         const modelConfig = getModelConfig(modelName);
         const isAddress = modelConfig.addressFields?.includes(field.name);
         const isEditor = modelConfig.editorFields?.includes(field.name);
+        const isRepeater = modelConfig.repeaterFields?.includes(field.name);
         const isFileUpload = modelConfig.fileUploadFields?.includes(field.name);
         const isImageUpload = modelConfig.imageUploadFields?.includes(field.name);
         const isVideoUpload = modelConfig.videoUploadFields?.includes(field.name);
@@ -234,6 +236,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         if (isEditor) {
             return 'editor';
+        }
+        if (isRepeater) {
+            return 'repeater';
         }
         if (isFileUpload) {
             return 'fileUpload';
@@ -266,6 +271,9 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
         }
         if (field.isList && field.type == "Json") {
             return 'json';
+        }
+        if (field.isList && field.type == "String") {
+            return 'repeater';
         }
 
         switch (field.type) {

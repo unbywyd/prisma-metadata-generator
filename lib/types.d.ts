@@ -25,7 +25,7 @@ export interface PrismaMetadata {
     enums: Record<string, string[]>;
 }
 export type UploadControlType = 'fileUpload' | 'imageUpload' | 'assetUpload' | 'videoUpload' | 'audioUpload' | 'documentUpload' | 'mediaUpload';
-export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | UploadControlType;
+export type ControlType = 'text' | 'textarea' | 'integer' | 'float' | 'address' | 'json' | 'select' | 'checkbox' | 'date' | 'relation' | 'editor' | 'repeater' | UploadControlType;
 export type StaticOrDynamic<T> = T | string;
 export interface FormControlConfig {
     name: string;

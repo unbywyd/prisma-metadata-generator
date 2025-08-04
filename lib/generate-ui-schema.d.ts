@@ -25,6 +25,7 @@ export type DefaultModelConfig = {
     addressFields?: string[];
     editorFields?: string[];
     textareaFields?: string[];
+    repeaterFields?: string[];
     fileUploadFields?: string[];
     imageUploadFields?: string[];
     videoUploadFields?: string[];
