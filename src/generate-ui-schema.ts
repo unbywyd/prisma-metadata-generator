@@ -160,6 +160,7 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
             pluralName: humanizeString(pluralize(modelName)),
             excludeCreateFields: ["id", "createdAt", "updatedAt", "deletedAt"],
             excludeUpdateFields: ["id", "updatedAt", "createdAt"],
+            includeFilterFields: ["id"], // По умолчанию включаем ID в фильтры
             canBeCreated: true,
             canBeDeleted: true,
             canBeEdited: true,
@@ -446,12 +447,21 @@ export function generateUiSchema(metadata: PrismaMetadata, options: GenerateUiSc
      * Решает, нужно ли генерировать фильтр для поля
      */
     function shouldGenerateFilter(model: PrismaModel, field: PrismaField): boolean {
-        // Генерируем фильтры только для полей, которые имеет смысл фильтровать
         const modelConfig = getModelConfig(model.name);
+        
+        // 1. Явное включение через includeFilterFields (высший приоритет)
         const includeFilterFields = modelConfig.includeFilterFields || [];
         if (includeFilterFields.includes(field.name)) return true;
-        if (field.isId) return false;
+        
+        // 2. Явное исключение через excludeFilterFields
         if (modelConfig.excludeFilterFields && modelConfig.excludeFilterFields.includes(field.name)) return false;
+        
+        // 3. ID поля по умолчанию не фильтруются (если не указаны в includeFilterFields выше)
+        // Причина: обычно ID - технические данные, редко нужны в UI фильтрах
+        // Исключение: техподдержка, дебаггинг, бизнес-ID
+        if (field.isId) return false;
+        
+        // 4. Проверка по типу поля - разрешаем фильтры для распространённых типов
         const includeFilterTypeFields = modelConfig.includeFilterTypeFields || ["Boolean", "Enum", "Number", "DateTime", "String", "Relation"];
         if (includeFilterTypeFields.includes(field.type)) return true;
 
