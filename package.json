@@ -1,6 +1,6 @@
 {
   "name": "prisma-metadata-generator",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "description": "Generate metadata from your Prisma schema. Create metadata for your Fastify or other TypeScript applications.",
   "bin": {
     "prisma-metadata-generator": "lib/bin.js"
@@ -17,7 +17,7 @@
     "email": "unbywyd@gmail.com"
   },
   "engines": {
-    "node": ">=18.19.0"
+    "node": ">=20.0.0"
   },
   "files": [
     "lib/",
@@ -34,8 +34,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@prisma/generator-helper": "^6.2.1",
-    "@prisma/internals": "^6.2.1",
+    "@prisma/generator-helper": "^7.0.0",
+    "@prisma/internals": "^7.0.0",
     "@types/pluralize": "^0.0.33",
     "fsesm": "^0.2.2",
     "humanize-string": "^3.0.0",
@@ -47,8 +47,8 @@
     "typescript": "^5.7.2"
   },
   "peerDependencies": {
-    "@prisma/client": "^6.6.0",
-    "prisma": "^6.6.0"
+    "@prisma/client": "^7.0.0",
+    "prisma": "^7.0.0"
   },
   "repository": {
     "type": "git",
